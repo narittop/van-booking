@@ -6,10 +6,12 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}" class="flex items-center">
-                        <svg class="h-8 w-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <!-- <svg class="h-8 w-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-                        </svg>
-                        <span class="ml-2 text-lg font-semibold text-gray-800">ระบบจองรถตู้</span>
+                        </svg> -->
+                           <img src="{{ asset('image/logorus.png') }}" alt="Logo" class="h-12 w-8">
+                        <span class="ml-2 text-lg font-semibold text-gray-800">ระบบขอใช้รถราชการ มทร.สุวรรณภูมิ</span>
+                     
                     </a>
                 </div>
 
@@ -32,17 +34,17 @@
                         @endif
                         <span class="border-l border-gray-300 h-6 self-center mx-2"></span>
                         <x-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.index')">
-                            การจองของฉัน
+                            การใช้รถของฉัน
                         </x-nav-link>
                         <x-nav-link :href="route('bookings.create')" :active="request()->routeIs('bookings.create')">
-                            ขอจองรถ
+                            ขอใช้รถ
                         </x-nav-link>
                     @else
                         <x-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.index')">
-                            การจองของฉัน
+                            การใช้รถของฉัน
                         </x-nav-link>
                         <x-nav-link :href="route('bookings.create')" :active="request()->routeIs('bookings.create')">
-                            ขอจองรถ
+                            ขอใช้รถ
                         </x-nav-link>
                     @endif
                 </div>

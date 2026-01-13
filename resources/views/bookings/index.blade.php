@@ -8,7 +8,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
-                ขอจองรถ
+                ขอใช้รถ
             </a>
         </div>
     </x-slot>
@@ -34,14 +34,14 @@
                             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
-                            <h3 class="mt-2 text-sm font-medium text-gray-900">ยังไม่มีการจอง</h3>
-                            <p class="mt-1 text-sm text-gray-500">เริ่มต้นโดยการขอจองรถตู้</p>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900">ยังไม่มีการขอใช้</h3>
+                            <p class="mt-1 text-sm text-gray-500">เริ่มต้นโดยการขอใช้รถตู้</p>
                             <div class="mt-6">
                                 <a href="{{ route('bookings.create') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold shadow-lg shadow-indigo-500/30 hover:from-indigo-700 hover:to-purple-700 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all duration-200">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                     </svg>
-                                    ขอจองรถ
+                                    ขอใช้รถ
                                 </a>
                             </div>
                         </div>

@@ -11,7 +11,7 @@
             @if($hrdPerson)
             <div class="bg-gradient-to-r from-indigo-500 to-purple-600 overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 text-white">
-                    <h3 class="text-lg font-semibold mb-4">ข้อมูลผู้ขอจอง</h3>
+                    <h3 class="text-lg font-semibold mb-4">ข้อมูลผู้ขอขอใช้รถ</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <p class="text-indigo-200 text-sm">ชื่อ-สกุล</p>
