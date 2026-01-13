@@ -1,0 +1,53 @@
+services:
+  #PHP Service
+  phpcarbooking:
+    image: saranphongturk1812/php8.3-mssql:0825
+    container_name: phpcarbooking
+    restart: unless-stopped
+    tty: true
+    working_dir: /var/www
+    volumes:
+      - ../:/var/www
+      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - backend
+
+  #Nginx Service
+  nginxcarbooking:
+    image: nginx:alpine
+    container_name: nginxcarbooking
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "8150:80"
+    # environment:
+    #   VIRTUAL_HOST: employ.rmutsb.ac.th
+    volumes:
+      - ../:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    depends_on:
+      - phpcarbooking
+    networks:
+      - backend
+
+  #Cache Server
+  cacheserver_carbooking:
+    image: redis
+    expose:
+      - 6379
+    networks:
+      - backend
+
+  #NodeJs Service
+  npm:
+    image: node:20
+    working_dir: /var/www/
+    volumes:
+      - ../:/var/www
+    command: tail -f /dev/null
+  #note sudo docker compose run --rm npm npm install
+
+  #Docker Networks
+networks:
+  backend:
+    external: true
