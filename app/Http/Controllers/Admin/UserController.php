@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Van;
+use App\Models\DirectorDepartment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -49,6 +50,7 @@ class UserController extends Controller
         $roles = [
             'user' => 'ผู้ใช้ทั่วไป',
             'driver' => 'พนักงานขับรถ',
+            'director' => 'ผู้อำนวยการ',
             'admin' => 'Super Admin',
             'admin_gad' => 'Admin กองกลาง',
             'admin_subnon' => 'Admin กองบริหารทรัพยากรนนทบุรี',
@@ -71,6 +73,7 @@ class UserController extends Controller
         $roles = [
             'user' => 'ผู้ใช้ทั่วไป',
             'driver' => 'พนักงานขับรถ',
+            'director' => 'ผู้อำนวยการ',
             'admin' => 'Super Admin',
             'admin_gad' => 'Admin กองกลาง',
             'admin_subnon' => 'Admin กองบริหารทรัพยากรนนทบุรี',
@@ -79,8 +82,13 @@ class UserController extends Controller
         ];
 
         $departments = \App\Models\Van::DEPARTMENT_LABELS;
+        
+        // Get current director departments
+        $directorDepartments = $user->isDirector() 
+            ? $user->directorDepartments()->pluck('department')->toArray() 
+            : [];
 
-        return view('admin.users.edit', compact('user', 'roles', 'departments'));
+        return view('admin.users.edit', compact('user', 'roles', 'departments', 'directorDepartments'));
     }
 
     /**
@@ -98,12 +106,18 @@ class UserController extends Controller
         }
 
         $rules = [
-            'role' => 'required|in:user,driver,admin,admin_gad,admin_subnon,admin_subwa,admin_subsu',
+            'role' => 'required|in:user,driver,director,admin,admin_gad,admin_subnon,admin_subwa,admin_subsu',
         ];
 
         // Require department for drivers
         if ($request->role === 'driver') {
             $rules['department'] = 'required|in:gad,subnon,subwa,subsu';
+        }
+
+        // Require at least one department for directors
+        if ($request->role === 'director') {
+            $rules['director_departments'] = 'required|array|min:1';
+            $rules['director_departments.*'] = 'in:gad,subnon,subwa,subsu';
         }
 
         $validated = $request->validate($rules);
@@ -116,6 +130,23 @@ class UserController extends Controller
         }
 
         $user->update($updateData);
+
+        // Handle director departments
+        if ($request->role === 'director') {
+            // Delete existing director departments
+            $user->directorDepartments()->delete();
+            
+            // Create new ones
+            foreach ($validated['director_departments'] as $dept) {
+                DirectorDepartment::create([
+                    'user_id' => $user->id,
+                    'department' => $dept,
+                ]);
+            }
+        } else {
+            // Clear director departments if role is not director
+            $user->directorDepartments()->delete();
+        }
 
         return redirect()->route('admin.users.index')
             ->with('success', 'อัปเดตสิทธิ์ของ ' . $user->name . ' เรียบร้อยแล้ว');

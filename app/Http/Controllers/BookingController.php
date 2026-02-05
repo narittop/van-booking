@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\Van;
 use App\Models\HrdPerson;
+use App\Services\LineNotifyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -88,6 +89,10 @@ class BookingController extends Controller
             }
         }
 
+        // Send LINE Notify notification
+        $booking->load('user');
+        (new LineNotifyService())->notifyNewBooking($booking);
+
         return redirect()->route('bookings.index')
             ->with('success', 'ส่งคำขอจองรถเรียบร้อยแล้ว รอการอนุมัติจากผู้ดูแลระบบ');
     }
@@ -140,6 +145,17 @@ class BookingController extends Controller
     }
 
     /**
+     * Public verification page for QR code scanning.
+     * Allows anyone with the QR code link to verify the booking is from this system.
+     */
+    public function verify(Booking $booking)
+    {
+        $booking->load(['van', 'driver', 'passengers', 'approver', 'user']);
+        
+        return view('bookings.verify', compact('booking'));
+    }
+
+    /**
      * Download booking as PDF.
      */
     public function downloadPdf(Booking $booking)
@@ -151,7 +167,23 @@ class BookingController extends Controller
 
         $booking->load(['van', 'driver', 'passengers', 'approver', 'user']);
         
-        $pdf = Pdf::loadView('bookings.pdf', compact('booking'));
+        // Generate QR code verification URL
+        $verifyUrl = route('bookings.verify', $booking);
+        
+        // Fetch QR code from API and convert to base64 for DOMPDF
+        $qrCodeBase64 = null;
+        try {
+            $qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode($verifyUrl);
+            $qrImageContent = file_get_contents($qrApiUrl);
+            if ($qrImageContent) {
+                $qrCodeBase64 = 'data:image/png;base64,' . base64_encode($qrImageContent);
+            }
+        } catch (\Exception $e) {
+            // If QR code generation fails, continue without it
+            $qrCodeBase64 = null;
+        }
+        
+        $pdf = Pdf::loadView('bookings.pdf', compact('booking', 'verifyUrl', 'qrCodeBase64'));
         $pdf->setPaper('a4', 'portrait');
         
         $filename = 'booking_' . str_pad($booking->id, 6, '0', STR_PAD_LEFT) . '.pdf';

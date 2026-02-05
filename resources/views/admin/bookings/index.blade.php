@@ -18,6 +18,10 @@
             <!-- Filters -->
             <div class="bg-white p-4 rounded-lg shadow-sm mb-6">
                 <form method="GET" class="flex flex-wrap gap-4 items-end">
+                    <div class="flex-grow">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ค้นหา</label>
+                        <input type="text" id="searchInput" placeholder="พิมพ์เพื่อค้นหา..." class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">สถานะ</label>
                         <select name="status" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
@@ -44,9 +48,10 @@
             <!-- Bookings Table -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200" id="bookingsTable">
                         <thead class="bg-gray-50">
                             <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">เลขที่</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ผู้ขอ</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">วันที่/เวลา</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">เส้นทาง</th>
@@ -58,7 +63,12 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             @forelse($bookings as $booking)
-                                <tr class="{{ $booking->status === 'pending' ? 'bg-yellow-50' : '' }}">
+                                <tr class="booking-row {{ $booking->status === 'pending' ? 'bg-yellow-50' : '' }}">
+                                      <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    #{{ str_pad($booking->id, 6, '0', STR_PAD_LEFT) }}
+                                                </div>
+                                            </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900">{{ $booking->user->name }}</div>
                                         <div class="text-sm text-gray-500">{{ $booking->user->email }}</div>
@@ -108,7 +118,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                                    <td colspan="8" class="px-6 py-12 text-center text-gray-500">
                                         ไม่พบข้อมูลการจอง
                                     </td>
                                 </tr>
@@ -122,4 +132,37 @@
             </div>
         </div>
     </div>
+    
+    <script>
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById('searchInput');
+            filter = input.value.toUpperCase();
+            table = document.getElementById('bookingsTable');
+            tr = table.getElementsByTagName('tr');
+    
+            for (i = 0; i < tr.length; i++) {
+                // Skip header row
+                if (tr[i].getElementsByTagName('th').length > 0) continue;
+                
+                var found = false;
+                var tds = tr[i].getElementsByTagName('td');
+                for (var j = 0; j < tds.length; j++) {
+                    if (tds[j]) {
+                        txtValue = tds[j].textContent || tds[j].innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (found) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        });
+    </script>
 </x-app-layout>

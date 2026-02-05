@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Van;
 use App\Models\User;
+use App\Services\LineNotifyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -73,7 +74,10 @@ class AdminController extends Controller
             $query->whereDate('start_date', $request->date);
         }
 
-        $bookings = $query->orderBy('created_at', 'desc')->paginate(15);
+        // Order by status priority: pending (รอรับเรื่อง) -> received (รออนุมัติ) -> approved -> completed -> others
+        $bookings = $query->orderByRaw("FIELD(status, 'pending', 'received', 'approved', 'completed', 'rejected') ASC")
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
 
         return view('admin.bookings.index', compact('bookings'));
     }
@@ -124,15 +128,15 @@ class AdminController extends Controller
     }
 
     /**
-     * Approve a booking.
+     * Receive a booking (รับเรื่อง - pending -> received).
      */
-    public function approve(Request $request, Booking $booking)
+    public function receive(Request $request, Booking $booking)
     {
         // Check department access
         $user = Auth::user();
         if (!$user->isSuperAdmin() && $user->isDepartmentAdmin()) {
             if ($booking->requested_department !== $user->getAdminDepartment()) {
-                abort(403, 'ไม่มีสิทธิ์อนุมัติคำขอของหน่วยงานนี้');
+                abort(403, 'ไม่มีสิทธิ์รับเรื่องคำขอของหน่วยงานนี้');
             }
         }
 
@@ -153,18 +157,22 @@ class AdminController extends Controller
         $booking->update([
             'van_id' => $validated['van_id'],
             'driver_id' => $validated['driver_id'] ?? null,
-            'status' => 'approved',
+            'status' => 'received',
             'admin_notes' => $validated['admin_notes'],
-            'approved_by' => Auth::id(),
-            'approved_at' => now(),
+            'received_by' => Auth::id(),
+            'received_at' => now(),
         ]);
 
+        // Send LINE Notify notification
+        $booking->load(['user', 'van', 'driver']);
+        (new LineNotifyService())->notifyBookingReceived($booking);
+
         return redirect()->route('admin.bookings')
-            ->with('success', 'อนุมัติการจองเรียบร้อยแล้ว');
+            ->with('success', 'รับเรื่องการจองเรียบร้อยแล้ว');
     }
 
     /**
-     * Reject a booking.
+     * Reject a booking (ไม่รับเรื่อง).
      */
     public function reject(Request $request, Booking $booking)
     {
@@ -172,7 +180,7 @@ class AdminController extends Controller
         $user = Auth::user();
         if (!$user->isSuperAdmin() && $user->isDepartmentAdmin()) {
             if ($booking->requested_department !== $user->getAdminDepartment()) {
-                abort(403, 'ไม่มีสิทธิ์ปฏิเสธคำขอของหน่วยงานนี้');
+                abort(403, 'ไม่มีสิทธิ์ไม่รับเรื่องคำขอของหน่วยงานนี้');
             }
         }
 
@@ -186,6 +194,10 @@ class AdminController extends Controller
             'approved_by' => Auth::id(),
             'approved_at' => now(),
         ]);
+
+        // Send LINE Notify notification
+        $booking->load('user');
+        (new LineNotifyService())->notifyBookingRejected($booking);
 
         return redirect()->route('admin.bookings')
             ->with('success', 'ปฏิเสธการจองเรียบร้อยแล้ว');
@@ -205,6 +217,10 @@ class AdminController extends Controller
         }
 
         $booking->update(['status' => 'completed']);
+
+        // Send LINE Notify notification
+        $booking->load(['user', 'van']);
+        (new LineNotifyService())->notifyBookingCompleted($booking);
 
         return back()->with('success', 'บันทึกการเดินทางเสร็จสิ้นแล้ว');
     }

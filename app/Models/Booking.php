@@ -25,6 +25,8 @@ class Booking extends Model
         'attachment_path',
         'status',
         'admin_notes',
+        'received_by',
+        'received_at',
         'approved_by',
         'approved_at',
     ];
@@ -32,6 +34,7 @@ class Booking extends Model
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
+        'received_at' => 'datetime',
         'approved_at' => 'datetime',
     ];
 
@@ -50,6 +53,11 @@ class Booking extends Model
         return $this->belongsTo(User::class, 'driver_id');
     }
 
+    public function receiver()
+    {
+        return $this->belongsTo(User::class, 'received_by');
+    }
+
     public function approver()
     {
         return $this->belongsTo(User::class, 'approved_by');
@@ -64,9 +72,10 @@ class Booking extends Model
     {
         return match($this->status) {
             'pending' => 'bg-yellow-100 text-yellow-800',
+            'received' => 'bg-blue-100 text-blue-800',
             'approved' => 'bg-green-100 text-green-800',
             'rejected' => 'bg-red-100 text-red-800',
-            'completed' => 'bg-blue-100 text-blue-800',
+            'completed' => 'bg-purple-100 text-purple-800',
             default => 'bg-gray-100 text-gray-800',
         };
     }
@@ -74,7 +83,8 @@ class Booking extends Model
     public function getStatusTextAttribute()
     {
         return match($this->status) {
-            'pending' => 'รอการอนุมัติ',
+            'pending' => 'รอรับเรื่อง',
+            'received' => 'รับเรื่องแล้ว',
             'approved' => 'อนุมัติแล้ว',
             'rejected' => 'ไม่อนุมัติ',
             'completed' => 'เสร็จสิ้น',

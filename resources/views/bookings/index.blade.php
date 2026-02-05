@@ -50,12 +50,12 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">วันที่เดินทาง</th>
                                         
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">เส้นทาง</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">เลขที่</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" width="30%">เส้นทาง/วันที่เดินทาง</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">จำนวนที่นั่ง</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รถ</th>
-                                       <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">หน่วยงานเจ้าของรถ</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">หน่วยงานเจ้าของรถ</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะ</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">การดำเนินการ</th>
                                     </tr>
@@ -65,6 +65,13 @@
                                         <tr>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm font-medium text-gray-900">
+                                                    #{{ str_pad($booking->id, 6, '0', STR_PAD_LEFT) }}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm text-gray-900">{{ $booking->pickup_location }}</div>
+                                                <div class="text-sm text-gray-500">→ {{ $booking->destination }}</div>
+                                                <div class="text-sm font-medium text-gray-900">
                                                     {{ $booking->start_date->format('d/m/Y') }} {{ $booking->start_time }} น.
                                                 </div>
                                                 <div class="text-sm text-gray-500">
@@ -72,10 +79,7 @@
                                                 </div>
                                             </td>
                                           
-                                            <td class="px-6 py-4">
-                                                <div class="text-sm text-gray-900">{{ $booking->pickup_location }}</div>
-                                                <div class="text-sm text-gray-500">→ {{ $booking->destination }}</div>
-                                            </td>
+                                          
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 {{ $booking->seats_requested }} ที่นั่ง
                                             </td>

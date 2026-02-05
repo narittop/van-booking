@@ -44,10 +44,10 @@
                             <p class="block text-sm font-medium text-gray-700 mb-3">ตั้งแต่วันที่ <span class="text-red-500">*</span></p>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label for="start_date" class="block text-xs text-gray-500 mb-1">วันที่เริ่มต้น</label>
+                                    <label for="start_date" class="block text-xs text-gray-500 mb-1">วันที่เริ่มต้น (สามารถเลือกได้ตั้งแต่วันพรุ่งนี้เป็นต้นไป)</label>
                                     <input type="date" name="start_date" id="start_date" 
                                         class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        value="{{ old('start_date') }}" min="{{ date('Y-m-d') }}" required>
+                                        value="{{ old('start_date') }}" min="{{ date('Y-m-d', strtotime('+1 day')) }}" required>
                                     @error('start_date')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
@@ -76,10 +76,10 @@
                             <p class="block text-sm font-medium text-gray-700 mb-3">ถึงวันที่ <span class="text-red-500">*</span></p>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label for="end_date" class="block text-xs text-gray-500 mb-1">วันที่สิ้นสุด</label>
+                                    <label for="end_date" class="block text-xs text-gray-500 mb-1">วันที่สิ้นสุด (สามารถเลือกได้ตั้งแต่วันพรุ่งนี้เป็นต้นไป)</label>
                                     <input type="date" name="end_date" id="end_date" 
                                         class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        value="{{ old('end_date') }}" min="{{ date('Y-m-d') }}" required>
+                                        value="{{ old('end_date') }}" min="{{ date('Y-m-d', strtotime('+1 day')) }}" required>
                                     @error('end_date')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror

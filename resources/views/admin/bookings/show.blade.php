@@ -30,9 +30,15 @@
                           
                             <p class="text-xs text-gray-400 mt-1">สร้างเมื่อ {{ $booking->created_at->format('d/m/Y H:i') }}</p>
                         </div>
-                        <span class="px-3 py-1 text-sm font-semibold rounded-full {{ $booking->status_badge }}">
-                            {{ $booking->status_text }}
-                        </span>
+                        <div class="flex items-center gap-2">
+                            <span class="px-3 py-1 text-sm font-semibold rounded-full {{ $booking->status_badge }}">
+                                {{ $booking->status_text }}
+                            </span>
+                            <span class="px-3 py-1 text-sm font-semibold rounded-full bg-gray-100 text-gray-900">
+                                #{{ str_pad($booking->id, 6, '0', STR_PAD_LEFT) }}
+                            </span>
+                        </div>
+                                              
                     </div>
  <div class="grid grid-cols gap-6 mb-6">
                             <div class="bg-yellow-50 rounded p-3">
@@ -249,14 +255,14 @@
                             <h4 class="text-lg font-medium text-gray-900 mb-4">ดำเนินการ</h4>
                             
                             <div class="grid grid-cols-2 gap-6">
-                                <!-- Approve Form -->
-                                <div class="bg-green-50 p-4 rounded-lg">
-                                    <h5 class="font-medium text-green-800 mb-3">อนุมัติการจอง</h5>
-                                    <form action="{{ route('admin.bookings.approve', $booking) }}" method="POST">
+                                <!-- Receive Form -->
+                                <div class="bg-blue-50 p-4 rounded-lg">
+                                    <h5 class="font-medium text-blue-800 mb-3">รับเรื่องการจอง</h5>
+                                    <form action="{{ route('admin.bookings.receive', $booking) }}" method="POST">
                                         @csrf
                                         <div class="mb-3">
                                             <label class="block text-sm font-medium text-gray-700 mb-1">เลือกรถ <span class="text-red-500">*</span></label>
-                                            <select name="van_id" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm">
+                                            <select name="van_id" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                                                 <option value="">-- เลือกรถ --</option>
                                                 @foreach($vans as $van)
                                                     @php
@@ -270,7 +276,7 @@
                                         </div>
                                         <div class="mb-3">
                                             <label class="block text-sm font-medium text-gray-700 mb-1">พนักงานขับรถ</label>
-                                            <select name="driver_id" class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm">
+                                            <select name="driver_id" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                                                 <option value="">-- ไม่ระบุ --</option>
                                                 @foreach($drivers as $driver)
                                                     <option value="{{ $driver->id }}">{{ $driver->name }}</option>
@@ -282,31 +288,31 @@
                                         </div>
                                         <div class="mb-3">
                                             <label class="block text-sm font-medium text-gray-700 mb-1">หมายเหตุ</label>
-                                            <textarea name="admin_notes" rows="2" class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm" placeholder="หมายเหตุเพิ่มเติม (ถ้ามี)"></textarea>
+                                            <textarea name="admin_notes" rows="2" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm" placeholder="หมายเหตุเพิ่มเติม (ถ้ามี)"></textarea>
                                         </div>
-                                        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl font-semibold shadow-lg shadow-emerald-500/30 hover:from-emerald-600 hover:to-green-700 hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all duration-200">
+                                        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-orange-500 text-white rounded-xl font-semibold shadow-lg shadow-orange-500/30 hover:bg-orange-600 hover:shadow-orange-600/40 hover:-translate-y-0.5 transition-all duration-200">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                                             </svg>
-                                            อนุมัติ
+                                            รับเรื่อง
                                         </button>
                                     </form>
                                 </div>
 
                                 <!-- Reject Form -->
                                 <div class="bg-red-50 p-4 rounded-lg">
-                                    <h5 class="font-medium text-red-800 mb-3">ไม่อนุมัติ</h5>
+                                    <h5 class="font-medium text-red-800 mb-3">ไม่รับเรื่อง</h5>
                                     <form action="{{ route('admin.bookings.reject', $booking) }}" method="POST">
                                         @csrf
                                         <div class="mb-3">
                                             <label class="block text-sm font-medium text-gray-700 mb-1">เหตุผล <span class="text-red-500">*</span></label>
-                                            <textarea name="admin_notes" rows="4" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-sm" placeholder="ระบุเหตุผลที่ไม่อนุมัติ"></textarea>
+                                            <textarea name="admin_notes" rows="4" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-sm" placeholder="ระบุเหตุผลที่ไม่รับเรื่อง"></textarea>
                                         </div>
-                                        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl font-semibold shadow-lg shadow-red-500/30 hover:from-red-600 hover:to-rose-700 hover:shadow-red-500/40 hover:-translate-y-0.5 transition-all duration-200" onclick="return confirm('ยืนยันการไม่อนุมัติ?')">
+                                        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl font-semibold shadow-lg shadow-red-500/30 hover:from-red-600 hover:to-rose-700 hover:shadow-red-500/40 hover:-translate-y-0.5 transition-all duration-200" onclick="return confirm('ยืนยันการไม่รับเรื่อง?')">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                             </svg>
-                                            ไม่อนุมัติ
+                                            ไม่รับเรื่อง
                                         </button>
                                     </form>
                                 </div>

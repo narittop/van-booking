@@ -17,7 +17,45 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    @if(Auth::user()->isAdmin())
+                    @php
+                        $viewMode = session('super_admin_view_mode', 'admin');
+                        $isSuperAdmin = Auth::user()->isSuperAdmin();
+                    @endphp
+
+                    @if($isSuperAdmin)
+                        {{-- Show menus based on selected view mode --}}
+                        @if($viewMode === 'admin')
+                            <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                                แดชบอร์ด
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.bookings')" :active="request()->routeIs('admin.bookings*')">
+                                จัดการคำขอ
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.vans.index')" :active="request()->routeIs('admin.vans*')">
+                                จัดการรถตู้
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users*')">
+                                จัดการสิทธิ์
+                            </x-nav-link>
+                            <x-nav-link :href="route('director.bookings')" :active="request()->routeIs('director.bookings*')">
+                                อนุมัติคำขอ
+                            </x-nav-link>
+                        @elseif($viewMode === 'director')
+                            <x-nav-link :href="route('director.dashboard')" :active="request()->routeIs('director.dashboard')">
+                                แดชบอร์ด
+                            </x-nav-link>
+                            <x-nav-link :href="route('director.bookings')" :active="request()->routeIs('director.bookings*')">
+                                อนุมัติคำขอ
+                            </x-nav-link>
+                        @endif
+                        <span class="border-l border-gray-300 h-6 self-center mx-2"></span>
+                        <x-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.index')">
+                            การใช้รถของฉัน
+                        </x-nav-link>
+                        <x-nav-link :href="route('bookings.create')" :active="request()->routeIs('bookings.create')">
+                            ขอใช้รถ
+                        </x-nav-link>
+                    @elseif(Auth::user()->isAdmin())
                         <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                             แดชบอร์ด
                         </x-nav-link>
@@ -27,11 +65,20 @@
                         <x-nav-link :href="route('admin.vans.index')" :active="request()->routeIs('admin.vans*')">
                             จัดการรถตู้
                         </x-nav-link>
-                        @if(Auth::user()->isSuperAdmin())
-                        <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users*')">
-                            จัดการสิทธิ์
+                        <span class="border-l border-gray-300 h-6 self-center mx-2"></span>
+                        <x-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.index')">
+                            การใช้รถของฉัน
                         </x-nav-link>
-                        @endif
+                        <x-nav-link :href="route('bookings.create')" :active="request()->routeIs('bookings.create')">
+                            ขอใช้รถ
+                        </x-nav-link>
+                    @elseif(Auth::user()->isDirector())
+                        <x-nav-link :href="route('director.dashboard')" :active="request()->routeIs('director.dashboard')">
+                            แดชบอร์ด
+                        </x-nav-link>
+                        <x-nav-link :href="route('director.bookings')" :active="request()->routeIs('director.bookings*')">
+                            อนุมัติคำขอ
+                        </x-nav-link>
                         <span class="border-l border-gray-300 h-6 self-center mx-2"></span>
                         <x-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.index')">
                             การใช้รถของฉัน
@@ -91,6 +138,22 @@
                             โปรไฟล์
                         </x-dropdown-link>
 
+                        {{-- Role Switcher for Super Admin --}}
+                        @if(Auth::user()->isSuperAdmin())
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <div class="px-4 py-2 text-xs text-gray-400 uppercase tracking-wider">สลับมุมมอง</div>
+                            <x-dropdown-link :href="route('switch.view.mode', 'admin')" class="{{ session('super_admin_view_mode', 'admin') === 'admin' ? 'bg-indigo-50 text-indigo-700' : '' }}">
+                                🛡️ Admin
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('switch.view.mode', 'director')" class="{{ session('super_admin_view_mode', 'admin') === 'director' ? 'bg-indigo-50 text-indigo-700' : '' }}">
+                                👔 ผู้อำนวยการ
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('switch.view.mode', 'user')" class="{{ session('super_admin_view_mode', 'admin') === 'user' ? 'bg-indigo-50 text-indigo-700' : '' }}">
+                                👤 ผู้ใช้ทั่วไป
+                            </x-dropdown-link>
+                            <div class="border-t border-gray-100 my-1"></div>
+                        @endif
+
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -135,6 +198,20 @@
                     จัดการสิทธิ์
                 </x-responsive-nav-link>
                 @endif
+                <div class="border-t border-gray-200 my-2"></div>
+                <x-responsive-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.index')">
+                    การจองของฉัน
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('bookings.create')" :active="request()->routeIs('bookings.create')">
+                    ขอจองรถ
+                </x-responsive-nav-link>
+            @elseif(Auth::user()->isDirector())
+                <x-responsive-nav-link :href="route('director.dashboard')" :active="request()->routeIs('director.dashboard')">
+                    แดชบอร์ด
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('director.bookings')" :active="request()->routeIs('director.bookings*')">
+                    อนุมัติคำขอ
+                </x-responsive-nav-link>
                 <div class="border-t border-gray-200 my-2"></div>
                 <x-responsive-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.index')">
                     การจองของฉัน

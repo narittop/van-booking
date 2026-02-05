@@ -74,14 +74,36 @@
                             <p class="text-xs text-gray-500 mt-1">พนักงานขับรถจะแสดงในรายการเลือกเฉพาะคำขอจากหน่วยงานเดียวกัน</p>
                         </div>
 
+                        <!-- Director Departments -->
+                        <div class="mb-6" id="director-section" style="{{ $user->role === 'director' ? '' : 'display: none;' }}">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">หน่วยงานที่ดูแล <span class="text-red-500">*</span></label>
+                            <div class="bg-gray-50 p-4 rounded-lg space-y-3">
+                                @foreach($departments as $value => $label)
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="checkbox" 
+                                               name="director_departments[]" 
+                                               value="{{ $value }}"
+                                               {{ in_array($value, $directorDepartments ?? []) ? 'checked' : '' }}
+                                               class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50">
+                                        <span class="ml-3 text-sm text-gray-700">{{ $label }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                            @error('director_departments')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                            <p class="text-xs text-gray-500 mt-1">เลือกหน่วยงานที่ผู้อำนวยการจะสามารถอนุมัติคำขอได้ (เลือกได้มากกว่า 1 หน่วยงาน)</p>
+                        </div>
+
                         <!-- Role Description -->
                         <div class="mb-6 bg-gray-50 p-4 rounded-lg">
                             <h4 class="text-sm font-medium text-gray-700 mb-2">คำอธิบายสิทธิ์</h4>
                             <ul class="text-sm text-gray-600 space-y-1">
                                 <li><strong class="text-gray-800">ผู้ใช้ทั่วไป:</strong> ขอจองรถได้อย่างเดียว</li>
-                                <li><strong class="text-blue-600">พนักงานขับรถ:</strong> สามารถเลือกมอบหมายตอนอนุมัติการจอง (ต้องระบุหน่วยงาน)</li>
+                                <li><strong class="text-blue-600">พนักงานขับรถ:</strong> สามารถเลือกมอบหมายตอนรับเรื่องการจอง (ต้องระบุหน่วยงาน)</li>
+                                <li><strong class="text-green-600">ผู้อำนวยการ:</strong> อนุมัติคำขอที่รับเรื่องแล้ว (เลือกได้หลายหน่วยงาน)</li>
                                 <li><strong class="text-red-600">Super Admin:</strong> จัดการทุกอย่างในระบบ</li>
-                                <li><strong class="text-purple-600">Admin หน่วยงาน:</strong> อนุมัติ/ปฏิเสธคำขอของหน่วยงานที่รับผิดชอบ</li>
+                                <li><strong class="text-purple-600">Admin หน่วยงาน:</strong> รับเรื่อง/ปฏิเสธคำขอของหน่วยงานที่รับผิดชอบ</li>
                             </ul>
                         </div>
 
@@ -89,10 +111,17 @@
                             function toggleDepartment() {
                                 var role = document.getElementById('role').value;
                                 var deptSection = document.getElementById('department-section');
+                                var directorSection = document.getElementById('director-section');
+                                
                                 if (role === 'driver') {
                                     deptSection.style.display = 'block';
+                                    directorSection.style.display = 'none';
+                                } else if (role === 'director') {
+                                    deptSection.style.display = 'none';
+                                    directorSection.style.display = 'block';
                                 } else {
                                     deptSection.style.display = 'none';
+                                    directorSection.style.display = 'none';
                                 }
                             }
                         </script>

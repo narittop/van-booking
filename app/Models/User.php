@@ -29,6 +29,7 @@ class User extends Authenticatable implements LdapAuthenticatable
         'guid',
         'domain',
         'idcard',
+        'line_notify_token',
     ];
 
     /**
@@ -103,6 +104,44 @@ class User extends Authenticatable implements LdapAuthenticatable
     public function isDriver(): bool
     {
         return $this->role === 'driver';
+    }
+
+    /**
+     * Check if user is a director
+     */
+    public function isDirector(): bool
+    {
+        return $this->role === 'director';
+    }
+
+    /**
+     * Get the departments that this director manages
+     */
+    public function directorDepartments()
+    {
+        return $this->hasMany(DirectorDepartment::class);
+    }
+
+    /**
+     * Get array of department codes that this director manages
+     */
+    public function getDirectorDepartments(): array
+    {
+        if (!$this->isDirector()) {
+            return [];
+        }
+        return $this->directorDepartments()->pluck('department')->toArray();
+    }
+
+    /**
+     * Check if director can manage a specific department
+     */
+    public function canDirectDepartment(string $department): bool
+    {
+        if (!$this->isDirector()) {
+            return false;
+        }
+        return $this->directorDepartments()->where('department', $department)->exists();
     }
 
     /**

@@ -6,6 +6,9 @@ services:
     restart: unless-stopped
     tty: true
     working_dir: /var/www
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     volumes:
       - ../:/var/www
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini

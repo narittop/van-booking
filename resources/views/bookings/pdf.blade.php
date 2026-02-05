@@ -192,15 +192,23 @@
     <table style="width: 100%; margin-bottom: 20px;">
         <tr>
             <td style="width: 15%; vertical-align: middle;">
-                {{-- <img src="{{ public_path('image/logorus.png') }}" style="width: 60px; height: auto;"> --}}
+                 <img src="{{ public_path('image/logorus.png') }}" style="width: 60px; height: auto;">
             </td>
-            <td style="width: 55%; vertical-align: middle;">
+            <td style="width: 45%; vertical-align: middle;">
                 <div style="font-size: 24px; font-weight: bold; color: #1e40af;">ใบขออนุญาตใช้รถราชการ</div>
                 <div style="font-size: 14px; color: #6366f1; margin-top: 5px;">มหาวิทยาลัยเทคโนโลยีราชมงคลสุวรรณภูมิ</div>
             </td>
-            <td style="width: 30%; text-align: right;">
+            <td style="width: 25%; text-align: right;">
                 <div style="font-size: 12px; color: #666;">เลขที่: <strong>#{{ str_pad($booking->id, 6, '0', STR_PAD_LEFT) }}</strong></div>
                 <div style="font-size: 11px; color: #888; margin-top: 3px;">วันที่พิมพ์: {{ now()->format('d/m/Y H:i') }}</div>
+            </td>
+            <td style="width: 15%; text-align: right; vertical-align: middle;">
+                @if(isset($qrCodeBase64) && $qrCodeBase64)
+                <div style="text-align: center;">
+                    <img src="{{ $qrCodeBase64 }}" style="width: 70px; height: 70px;">
+                    <div style="font-size: 9px; color: #888; margin-top: 2px;">สแกนเพื่อตรวจสอบ</div>
+                </div>
+                @endif
             </td>
         </tr>
     </table>
@@ -337,8 +345,8 @@
     
     <!-- Admin Notes -->
     @if($booking->admin_notes)
-    <div style="margin-bottom: 20px;">
-        <div style="font-size: 14px; font-weight: bold; color: #374151; margin-bottom: 8px;">📌 หมายเหตุจากผู้อนุมัติ</div>
+    <div style="margin-bottom: 5px;">
+        <div style="font-size: 14px; font-weight: bold; color: #374151; margin-bottom: 5px;">หมายเหตุจากผู้อนุมัติ</div>
         <div style="background: #fef3c7; border: 1px solid #fcd34d; border-left: 4px solid #f59e0b; padding: 12px; border-radius: 4px; font-size: 13px;">
             {{ $booking->admin_notes }}
             @if($booking->approver)
@@ -351,29 +359,32 @@
     @endif
     
     <!-- Signature Section -->
-    <div style="margin-top: 10px;">
+    <div style="margin-top: 5px;">
         <table style="width: 100%;">
             <tr>
-                <td style="width: 50%; text-align: center; padding: 20px;">
+                <td style="width: 30%; text-align: center; padding: 20px;">
                     <div style="margin-top: 50px; border-top: 1px solid #333; width: 180px; margin-left: auto; margin-right: auto; padding-top: 8px;">
-                        ลงชื่อ................................................
+                       ผู้ขอใช้รถ
                     </div>
-                    <div style="margin-top: 5px; font-size: 12px;">(ผู้ขอใช้รถ)</div>
-                    <div style="font-size: 11px; color: #666;">วันที่............/............/............</div>
+                    <div style="margin-top: 5px; font-size: 12px;">@if($booking->user){{ $booking->user->name }}@endif</div>
+                    <div style="font-size: 11px; color: #666;">วันที่ {{ $booking->created_at->format('d/m/Y H:i:s') }}</div>
                 </td>
-                <td style="width: 50%; text-align: center; padding: 20px;">
+                <td style="width: 40%; text-align: center; padding: 20px;">
                     <div style="margin-top: 50px; border-top: 1px solid #333; width: 180px; margin-left: auto; margin-right: auto; padding-top: 8px;">
-                        ลงชื่อ................................................
+                        ผู้อนุมัติ
                     </div>
-                    <div style="margin-top: 5px; font-size: 12px;">(ผู้อนุมัติ)</div>
-                    <div style="font-size: 11px; color: #666;">วันที่............/............/............</div>
+                    <div style="margin-top: 5px; font-size: 12px;">@if($booking->approver){{ $booking->approver->name }}@else ................................................@endif</div>
+                    <div style="font-size: 11px; color: #666;">วันที่ {{ $booking->approved_at ? $booking->approved_at->format('d/m/Y H:i:s') : '................................................' }}</div>
+                </td>
+                <td style="width: 30%; text-align: center; padding: 20px;">
+
                 </td>
             </tr>
         </table>
     </div>
     
     <!-- Footer -->
-    <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #e5e7eb; text-align: center; font-size: 10px; color: #888;">
+    <div style="margin-top: 10px; padding-top: 5px; border-top: 1px solid #e5e7eb; text-align: center; font-size: 10px; color: #888;">
         เอกสารนี้พิมพ์จากระบบจองรถตู้ มหาวิทยาลัยเทคโนโลยีราชมงคลสุวรรณภูมิ
     </div>
 </body>

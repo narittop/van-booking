@@ -88,6 +88,10 @@
                                             <span class="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
                                                 {{ $roles[$user->role] ?? $user->role }}
                                             </span>
+                                        @elseif($user->isDirector())
+                                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                                ผู้อำนวยการ
+                                            </span>
                                         @elseif($user->isDriver())
                                             <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                                                 พนักงานขับรถ
@@ -99,7 +103,16 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $user->department ?? '-' }}
+                                        @if($user->isDirector())
+                                            @php
+                                                $deptLabels = $user->directorDepartments->map(function($d) {
+                                                    return \App\Models\Van::DEPARTMENT_LABELS[$d->department] ?? $d->department;
+                                                })->implode(', ');
+                                            @endphp
+                                            {{ $deptLabels ?: '-' }}
+                                        @else
+                                            {{ $user->department ?? '-' }}
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {{ $user->created_at->format('d/m/Y') }}

@@ -31,4 +31,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'line_notify' => [
+        'token' => env('LINE_NOTIFY_TOKEN'),
+        'api_url' => 'https://notify-api.line.me/api/notify',
+        'client_id' => env('LINE_NOTIFY_CLIENT_ID'),
+        'client_secret' => env('LINE_NOTIFY_CLIENT_SECRET'),
+        'redirect_uri' => env('LINE_NOTIFY_REDIRECT_URI'),
+    ],
+
 ];

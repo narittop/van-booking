@@ -19,6 +19,9 @@
                     <!-- Status Badge -->
                     <div class="mb-6 flex justify-between items-start">
                         <div>
+                             <span class="inline-flex items-center gap-2 px-4 py-2 text-base font-semibold rounded-full bg-gray-100 text-gray-900">
+                                #{{ str_pad($booking->id, 6, '0', STR_PAD_LEFT) }}
+                            </span>
                             <span class="inline-flex items-center gap-2 px-4 py-2 text-base font-semibold rounded-full {{ $booking->status_badge }}">
                                 @if($booking->status === 'pending')
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,6 +114,19 @@
                                     @endif
                                 </dd>
                             </div>
+                        @if($booking->approver)
+                             <div>
+                                <dt class="text-sm font-medium text-gray-500">ผู้อนุมัติ</dt>
+                                <dd class="text-sm text-gray-900 mt-1">
+                                
+                                 
+                                        โดย {{ $booking->approver->name }} 
+                                        เมื่อ {{ $booking->approved_at->format('d/m/Y H:i') }}
+                                   
+                               
+                                </dd>
+                            </div>
+                        @endif
                         </dl>
                     </div>
 
@@ -141,15 +157,11 @@
                             <h3 class="text-lg font-medium text-gray-900 mb-2">หมายเหตุจากผู้ดูแล</h3>
                             <div class="bg-gray-50 p-4 rounded-md">
                                 <p class="text-sm text-gray-700">{{ $booking->admin_notes }}</p>
-                                @if($booking->approver)
-                                    <p class="text-xs text-gray-500 mt-2">
-                                        โดย {{ $booking->approver->name }} 
-                                        เมื่อ {{ $booking->approved_at->format('d/m/Y H:i') }}
-                                    </p>
-                                @endif
+                               
                             </div>
                         </div>
                     @endif
+                    
 
                     <!-- Fellow Travelers from Other Bookings -->
                     @if(isset($fellowTravelers) && $fellowTravelers->count() > 0)
