@@ -71,6 +71,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/bookings/{booking}/receive', [AdminController::class, 'receive'])->name('bookings.receive');
     Route::post('/bookings/{booking}/reject', [AdminController::class, 'reject'])->name('bookings.reject');
     Route::post('/bookings/{booking}/complete', [AdminController::class, 'complete'])->name('bookings.complete');
+    Route::put('/bookings/{booking}/update-assignment', [AdminController::class, 'updateAssignment'])->name('bookings.update-assignment');
+    Route::post('/bookings/{booking}/cancel', [AdminController::class, 'cancel'])->name('bookings.cancel');
+
+    // Reports
+    Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
+    Route::get('/reports/export', [AdminController::class, 'exportReport'])->name('reports.export');
 });
 
 // Director Routes

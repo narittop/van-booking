@@ -34,6 +34,9 @@
                             <x-nav-link :href="route('admin.vans.index')" :active="request()->routeIs('admin.vans*')">
                                 จัดการรถตู้
                             </x-nav-link>
+                            <x-nav-link :href="route('admin.reports')" :active="request()->routeIs('admin.reports*')">
+                                รายงาน
+                            </x-nav-link>
                             <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users*')">
                                 จัดการสิทธิ์
                             </x-nav-link>
@@ -64,6 +67,9 @@
                         </x-nav-link>
                         <x-nav-link :href="route('admin.vans.index')" :active="request()->routeIs('admin.vans*')">
                             จัดการรถตู้
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.reports')" :active="request()->routeIs('admin.reports*')">
+                            รายงาน
                         </x-nav-link>
                         <span class="border-l border-gray-300 h-6 self-center mx-2"></span>
                         <x-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.index')">
@@ -192,6 +198,9 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.vans.index')" :active="request()->routeIs('admin.vans*')">
                     จัดการรถตู้
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.reports')" :active="request()->routeIs('admin.reports*')">
+                    รายงาน
                 </x-responsive-nav-link>
                 @if(Auth::user()->isSuperAdmin())
                 <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users*')">

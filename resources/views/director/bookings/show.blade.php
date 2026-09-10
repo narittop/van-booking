@@ -35,6 +35,13 @@
                             <p class="text-xs text-gray-400 mt-1">สร้างเมื่อ {{ $booking->created_at->format('d/m/Y H:i') }}</p>
                         </div>
                         <div class="flex items-center gap-2">
+                            <!-- Download PDF Button -->
+                            <a href="{{ route('bookings.pdf', $booking) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                ดาวน์โหลด PDF
+                            </a>
                             <span class="px-3 py-1 text-sm font-semibold rounded-full {{ $booking->status_badge }}">
                                 {{ $booking->status_text }}
                             </span>
@@ -81,6 +88,10 @@
                                     <dt class="w-28 text-sm text-gray-500">ที่นั่ง:</dt>
                                     <dd class="text-sm text-gray-900 font-medium">{{ $booking->seats_requested }} ที่นั่ง</dd>
                                 </div>
+                                <div class="flex">
+                                    <dt class="w-28 text-sm text-gray-500">ติดต่อ:</dt>
+                                    <dd class="text-sm text-gray-900 font-medium">{{ $booking->contact ?? '-' }}</dd>
+                                </div>
                             </dl>
                         </div>
                         <div>
@@ -99,6 +110,21 @@
                             @endif
                             @if($booking->driver)
                                 <p class="text-sm"><span class="text-gray-500">พนักงานขับรถ:</span> <span class="font-medium">{{ $booking->driver->name }}</span></p>
+                            @endif
+                        </div>
+                    </div>
+                    @else
+                    <div class="mb-6 pb-6 border-b">
+                        <h4 class="text-sm font-medium text-red-600 mb-3">สถานะจากผู้รับเรื่อง</h4>
+                        <div class="bg-red-50 p-4 rounded border border-red-200">
+                            <p class="text-sm text-red-800 font-semibold flex items-center gap-1.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                รับเรื่อง(ไม่จัดรถ)สำหรับคำขอนี้
+                            </p>
+                            @if($booking->admin_notes)
+                                <p class="text-sm mt-2 text-gray-700"><span class="font-medium text-gray-900">เหตุผล/หมายเหตุ:</span> {{ $booking->admin_notes }}</p>
                             @endif
                         </div>
                     </div>

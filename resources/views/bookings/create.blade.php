@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            ขอจองรถตู้
+            แบบคำขอใช้รถราชการ
         </h2>
     </x-slot>
 
@@ -161,9 +161,20 @@
                             @enderror
                         </div>
 
+                        <!-- Contact Channel -->
+                        <div class="mb-6">
+                            <label for="contact" class="block text-sm font-medium text-gray-700 mb-2">ช่องทางการติดต่อ (เช่น เบอร์โทรศัพท์ / LINE ID / อีเมล) <span class="text-red-500">*</span></label>
+                            <input type="text" name="contact" id="contact" 
+                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                value="{{ old('contact', auth()->user()->phone) }}" placeholder="ระบุช่องทางที่เจ้าหน้าที่สามารถติดต่อท่านได้" required>
+                            @error('contact')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
                         <!-- Attachment -->
                         <div class="mb-6">
-                            <label for="attachment" class="block text-sm font-medium text-gray-700 mb-2">เอกสารแนบ (ถ้ามี)</label>
+                            <label for="attachment" class="block text-sm font-medium text-gray-700 mb-2">เอกสารแนบ</label>
                             <input type="file" name="attachment" id="attachment" 
                                 class="w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                                 accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
@@ -171,6 +182,8 @@
                             @error('attachment')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
+
+                            
                         </div>
 
                         <!-- Passengers Section -->

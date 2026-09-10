@@ -7,7 +7,7 @@
                 </svg>
             </a>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                รายละเอียดคำขอจอง
+                รายละเอียดการขอใช้รถราชการ
             </h2>
         </div>
     </x-slot>
@@ -31,6 +31,14 @@
                             <p class="text-xs text-gray-400 mt-1">สร้างเมื่อ {{ $booking->created_at->format('d/m/Y H:i') }}</p>
                         </div>
                         <div class="flex items-center gap-2">
+                            <!-- Download PDF Button -->
+                            <a href="{{ route('bookings.pdf', $booking) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                ดาวน์โหลด PDF
+                            </a>
+                            
                             <span class="px-3 py-1 text-sm font-semibold rounded-full {{ $booking->status_badge }}">
                                 {{ $booking->status_text }}
                             </span>
@@ -82,6 +90,10 @@
                                 <div class="flex">
                                     <dt class="w-28 text-sm text-gray-500">ที่นั่ง:</dt>
                                     <dd class="text-sm text-gray-900 font-medium">{{ $booking->seats_requested }} ที่นั่ง</dd>
+                                </div>
+                                <div class="flex">
+                                    <dt class="w-28 text-sm text-gray-500">ติดต่อ:</dt>
+                                    <dd class="text-sm text-gray-900 font-medium">{{ $booking->contact ?? '-' }}</dd>
                                 </div>
                             </dl>
                         </div>
@@ -299,23 +311,23 @@
                                     </form>
                                 </div>
 
-                                <!-- Reject Form -->
-                                <div class="bg-red-50 p-4 rounded-lg">
-                                    <h5 class="font-medium text-red-800 mb-3">ไม่รับเรื่อง</h5>
-                                    <form action="{{ route('admin.bookings.reject', $booking) }}" method="POST">
-                                        @csrf
-                                        <div class="mb-3">
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">เหตุผล <span class="text-red-500">*</span></label>
-                                            <textarea name="admin_notes" rows="4" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-sm" placeholder="ระบุเหตุผลที่ไม่รับเรื่อง"></textarea>
-                                        </div>
-                                        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl font-semibold shadow-lg shadow-red-500/30 hover:from-red-600 hover:to-rose-700 hover:shadow-red-500/40 hover:-translate-y-0.5 transition-all duration-200" onclick="return confirm('ยืนยันการไม่รับเรื่อง?')">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                            </svg>
-                                            ไม่รับเรื่อง
-                                        </button>
-                                    </form>
-                                </div>
+                                 <!-- Reject Form -->
+                                 <div class="bg-red-50 p-4 rounded-lg">
+                                     <h5 class="font-medium text-red-800 mb-3">รับเรื่อง(ไม่จัดรถ)</h5>
+                                     <form action="{{ route('admin.bookings.reject', $booking) }}" method="POST">
+                                         @csrf
+                                         <div class="mb-3">
+                                             <label class="block text-sm font-medium text-gray-700 mb-1">เหตุผล <span class="text-red-500">*</span></label>
+                                             <textarea name="admin_notes" rows="4" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-sm" placeholder="ระบุเหตุผลที่รับเรื่อง(ไม่จัดรถ)"></textarea>
+                                         </div>
+                                         <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl font-semibold shadow-lg shadow-red-500/30 hover:from-red-600 hover:to-rose-700 hover:shadow-red-500/40 hover:-translate-y-0.5 transition-all duration-200" onclick="return confirm('ยืนยันการรับเรื่อง(ไม่จัดรถ)?')">
+                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                             </svg>
+                                             รับเรื่อง(ไม่จัดรถ)
+                                         </button>
+                                     </form>
+                                 </div>
                             </div>
                         </div>
                     @else
@@ -335,6 +347,152 @@
                                     @if($booking->admin_notes)
                                         <p class="text-sm mt-2"><span class="text-gray-500">หมายเหตุ:</span> {{ $booking->admin_notes }}</p>
                                     @endif
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- Edit Assignment Section (for received/approved bookings) --}}
+                        @if(in_array($booking->status, ['received', 'approved']))
+                            <div class="border-t pt-6 mt-6" x-data="{ showEditForm: false }">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="text-lg font-medium text-gray-900">การจัดรถและคนขับ</h4>
+                                    <button type="button" @click="showEditForm = !showEditForm" class="inline-flex items-center gap-1 px-3 py-1.5 text-teal-700 bg-teal-50 rounded-lg font-medium hover:bg-teal-100 hover:text-teal-800 transition-colors duration-150">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                        <span x-text="showEditForm ? 'ยกเลิก' : 'แก้ไข'"></span>
+                                    </button>
+                                </div>
+
+                                {{-- Current Assignment Info --}}
+                                <div x-show="!showEditForm" class="bg-gray-50 p-4 rounded">
+                                    @if($booking->van)
+                                        <p class="text-sm"><span class="text-gray-500">รถ:</span> {{ $booking->van->name }} ({{ $booking->van->license_plate }})</p>
+                                    @else
+                                        <p class="text-sm"><span class="text-gray-500">รถ:</span> <span class="text-gray-400">ยังไม่ได้จัด</span></p>
+                                    @endif
+                                    @if($booking->driver)
+                                        <p class="text-sm"><span class="text-gray-500">พนักงานขับรถ:</span> {{ $booking->driver->name }}</p>
+                                    @else
+                                        <p class="text-sm"><span class="text-gray-500">พนักงานขับรถ:</span> <span class="text-gray-400">ยังไม่ได้ระบุ</span></p>
+                                    @endif
+                                </div>
+
+                                {{-- Edit Form --}}
+                                <div x-show="showEditForm" x-cloak class="bg-teal-50 p-4 rounded-lg border border-teal-200">
+                                    <form action="{{ route('admin.bookings.update-assignment', $booking) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">เลือกรถ <span class="text-red-500">*</span></label>
+                                                <select name="van_id" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 text-sm">
+                                                    <option value="">-- เลือกรถ --</option>
+                                                    @foreach($vans as $van)
+                                                        @php
+                                                            $available = $van->getAvailableSeatsForDateRange($booking->start_date, $booking->end_date);
+                                                        @endphp
+                                                        <option value="{{ $van->id }}" {{ $booking->van_id == $van->id ? 'selected' : '' }} {{ $available < $booking->seats_requested && $booking->van_id != $van->id ? 'disabled' : '' }}>
+                                                            {{ $van->name }} ({{ $van->license_plate }}) - ว่าง {{ $available }}/{{ $van->capacity }} ที่นั่ง
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">พนักงานขับรถ</label>
+                                                <select name="driver_id" class="w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 text-sm">
+                                                    <option value="">-- ไม่ระบุ --</option>
+                                                    @foreach($drivers as $driver)
+                                                        <option value="{{ $driver->id }}" {{ $booking->driver_id == $driver->id ? 'selected' : '' }}>
+                                                            {{ $driver->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="flex justify-end">
+                                            <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-teal-500 text-white rounded-xl font-semibold shadow-lg shadow-teal-500/30 hover:bg-teal-600 hover:shadow-teal-600/40 hover:-translate-y-0.5 transition-all duration-200">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                                บันทึกการแก้ไข
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- Closing Section (Only for approved) -->
+                        @if($booking->status === 'approved')
+                            <div class="border-t pt-6 mt-6">
+                                <h4 class="text-lg font-medium text-gray-900 mb-4">ปิดงานการเดินทาง</h4>
+                                <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100">
+                                    <form action="{{ route('admin.bookings.complete', $booking) }}" method="POST" x-data="{ start: '', end: '', total: '' }">
+                                        @csrf
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                            @php
+                                                $latestMileage = null;
+                                                if ($booking->van) {
+                                                    $latestMileage = $booking->van->bookings()
+                                                        ->where('status', 'completed')
+                                                        ->whereNotNull('end_mileage')
+                                                        ->where('id', '!=', $booking->id)
+                                                        ->orderBy('end_date', 'desc')
+                                                        ->orderBy('updated_at', 'desc')
+                                                        ->value('end_mileage');
+                                                }
+                                            @endphp
+                                            
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">เลขไมล์เริ่มต้น (กม.)</label>
+                                                <input type="number" step="0.01" name="start_mileage" required x-model="start" @input="total = (end - start > 0 ? (end - start).toFixed(2) : '')" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors" placeholder="0.00">
+                                                @if($latestMileage)
+                                                    <p class="mt-1 text-xs text-gray-500 flex items-center gap-1">
+                                                        <span>ลอกเลขไมล์ล่าสุด:</span>
+                                                        <button type="button" @click="start = {{ $latestMileage }}; total = (end !== '' && end - start > 0 ? (end - start).toFixed(2) : '')" class="text-indigo-600 hover:text-indigo-800 font-medium hover:underline transition-colors" title="คลิกเพื่อคัดลอกเลขไมล์">
+                                                            {{ number_format($latestMileage, 2) }}
+                                                        </button>
+                                                    </p>
+                                                @endif
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">เลขไมล์สิ้นสุด (กม.)</label>
+                                                <input type="number" step="0.01" name="end_mileage" required x-model="end" @input="total = (end - start > 0 ? (end - start).toFixed(2) : '')" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors" placeholder="0.00">
+                                                <p x-show="start !== '' && end !== '' && Number(end) <= Number(start)" x-cloak class="mt-1 text-sm text-red-600">เลขไมล์สิ้นสุดต้องมากกว่าเริ่มต้น</p>
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">รวมระยะทาง (กม.)</label>
+                                                <input type="number" step="0.01" name="total_distance" x-model="total" class="w-full bg-gray-100 rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors" readonly placeholder="0.00">
+                                            </div>
+                                        </div>
+                                        <div class="flex justify-end">
+                                            <button type="submit" :disabled="start !== '' && end !== '' && Number(end) <= Number(start)" :class="{ 'opacity-50 cursor-not-allowed': start !== '' && end !== '' && Number(end) <= Number(start) }" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-black rounded-xl font-semibold shadow-lg shadow-green-500/30 hover:from-green-600 hover:to-emerald-700 hover:shadow-green-500/40 hover:-translate-y-0.5 transition-all duration-200">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                                บันทึกและปิดงาน
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        @elseif($booking->status === 'completed' && ($booking->start_mileage || $booking->end_mileage || $booking->total_distance))
+                            <div class="border-t pt-6 mt-6">
+                                <h4 class="text-sm font-medium text-gray-500 mb-3">ข้อมูลการใช้งานรถ (เลขไมล์)</h4>
+                                <div class="bg-gray-50 p-4 rounded grid grid-cols-3 gap-4">
+                                    <div class="text-center">
+                                        <p class="text-xs text-gray-500 uppercase tracking-wide">ไมล์เริ่มต้น</p>
+                                        <p class="mt-1 text-lg font-semibold text-gray-900">{{ number_format($booking->start_mileage, 2) }}</p>
+                                    </div>
+                                    <div class="text-center border-l border-r border-gray-200">
+                                        <p class="text-xs text-gray-500 uppercase tracking-wide">ไมล์สิ้นสุด</p>
+                                        <p class="mt-1 text-lg font-semibold text-gray-900">{{ number_format($booking->end_mileage, 2) }}</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <p class="text-xs text-gray-500 uppercase tracking-wide">รวมระยะทาง (กม.)</p>
+                                        <p class="mt-1 text-lg font-bold text-indigo-600">{{ number_format($booking->total_distance, 2) }}</p>
+                                    </div>
                                 </div>
                             </div>
                         @endif

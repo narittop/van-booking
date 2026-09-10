@@ -159,4 +159,12 @@ class User extends Authenticatable implements LdapAuthenticatable
     {
         return $this->hasMany(Booking::class, 'driver_id');
     }
+
+    /**
+     * Get the HRD person record for the user.
+     */
+    public function hrdPerson()
+    {
+        return $this->hasOne(HrdPerson::class, 'id_card', 'idcard');
+    }
 }

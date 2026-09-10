@@ -7,7 +7,7 @@
                 </svg>
             </a>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                รายละเอียดการจอง
+                รายละเอียดการขอใช้รถราชการ
             </h2>
         </div>
     </x-slot>
@@ -114,16 +114,25 @@
                                     @endif
                                 </dd>
                             </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">ช่องทางการติดต่อ</dt>
+                                <dd class="text-sm text-gray-900 mt-1">{{ $booking->contact ?? '-' }}</dd>
+                            </div>
+                        @if($booking->receiver)
+                             <div>
+                                <dt class="text-sm font-medium text-gray-500">ผู้รับเรื่อง</dt>
+                                <dd class="text-sm text-gray-900 mt-1">
+                                        โดย {{ $booking->receiver->name }} 
+                                        เมื่อ {{ $booking->received_at->format('d/m/Y H:i') }}
+                                </dd>
+                            </div>
+                        @endif
                         @if($booking->approver)
                              <div>
                                 <dt class="text-sm font-medium text-gray-500">ผู้อนุมัติ</dt>
                                 <dd class="text-sm text-gray-900 mt-1">
-                                
-                                 
                                         โดย {{ $booking->approver->name }} 
                                         เมื่อ {{ $booking->approved_at->format('d/m/Y H:i') }}
-                                   
-                               
                                 </dd>
                             </div>
                         @endif

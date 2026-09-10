@@ -21,13 +21,15 @@ class AdminController extends Controller
         
         // Base query - filter by department for department admins
         $bookingsQuery = Booking::query();
+        $vansQuery = Van::query();
         if (!$user->isSuperAdmin() && $user->isDepartmentAdmin()) {
             $bookingsQuery->where('requested_department', $user->getAdminDepartment());
+            $vansQuery->where('owner_department', $user->getAdminDepartment());
         }
         
         $stats = [
-            'total_vans' => Van::count(),
-            'active_vans' => Van::where('status', 'active')->count(),
+            'total_vans' => (clone $vansQuery)->count(),
+            'active_vans' => (clone $vansQuery)->where('status', 'active')->count(),
             'pending_bookings' => (clone $bookingsQuery)->where('status', 'pending')->count(),
             'approved_today' => (clone $bookingsQuery)->where('status', 'approved')
                 ->whereDate('start_date', today())
@@ -57,7 +59,7 @@ class AdminController extends Controller
     public function bookings(Request $request)
     {
         $user = Auth::user();
-        $query = Booking::with(['user', 'van']);
+        $query = Booking::with(['user', 'van', 'driver']);
 
         // Filter by department for department admins
         if (!$user->isSuperAdmin() && $user->isDepartmentAdmin()) {
@@ -69,17 +71,21 @@ class AdminController extends Controller
             $query->where('status', $request->status);
         }
 
-        // Filter by date
-        if ($request->has('date')) {
+        // Filter by date (only when a date is actually provided)
+        if ($request->filled('date')) {
             $query->whereDate('start_date', $request->date);
         }
 
         // Order by status priority: pending (รอรับเรื่อง) -> received (รออนุมัติ) -> approved -> completed -> others
-        $bookings = $query->orderByRaw("FIELD(status, 'pending', 'received', 'approved', 'completed', 'rejected') ASC")
+        $bookings = $query->orderByRaw("FIELD(status, 'pending', 'received', 'approved', 'completed', 'rejected', 'cancelled') ASC")
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
-        return view('admin.bookings.index', compact('bookings'));
+        // Load all vans and drivers - filtering by booking's requested_department is done in the view
+        $vans = Van::where('status', 'active')->get();
+        $drivers = User::where('role', 'driver')->orderBy('name')->get();
+
+        return view('admin.bookings.index', compact('bookings', 'vans', 'drivers'));
     }
 
     /**
@@ -172,7 +178,7 @@ class AdminController extends Controller
     }
 
     /**
-     * Reject a booking (ไม่รับเรื่อง).
+     * Reject a booking (รับเรื่อง(ไม่จัดรถ)).
      */
     public function reject(Request $request, Booking $booking)
     {
@@ -180,7 +186,7 @@ class AdminController extends Controller
         $user = Auth::user();
         if (!$user->isSuperAdmin() && $user->isDepartmentAdmin()) {
             if ($booking->requested_department !== $user->getAdminDepartment()) {
-                abort(403, 'ไม่มีสิทธิ์ไม่รับเรื่องคำขอของหน่วยงานนี้');
+                abort(403, 'ไม่มีสิทธิ์รับเรื่อง(ไม่จัดรถ)คำขอของหน่วยงานนี้');
             }
         }
 
@@ -189,24 +195,26 @@ class AdminController extends Controller
         ]);
 
         $booking->update([
-            'status' => 'rejected',
+            'status' => 'received',
+            'van_id' => null,
+            'driver_id' => null,
             'admin_notes' => $validated['admin_notes'],
-            'approved_by' => Auth::id(),
-            'approved_at' => now(),
+            'received_by' => Auth::id(),
+            'received_at' => now(),
         ]);
 
         // Send LINE Notify notification
-        $booking->load('user');
-        (new LineNotifyService())->notifyBookingRejected($booking);
+        $booking->load(['user', 'van', 'driver']);
+        (new LineNotifyService())->notifyBookingReceived($booking);
 
         return redirect()->route('admin.bookings')
-            ->with('success', 'ปฏิเสธการจองเรียบร้อยแล้ว');
+            ->with('success', 'ส่งเรื่องไปยังผู้อนุมัติเรียบร้อยแล้ว');
     }
 
     /**
      * Mark booking as completed.
      */
-    public function complete(Booking $booking)
+    public function complete(Request $request, Booking $booking)
     {
         // Check department access
         $user = Auth::user();
@@ -216,12 +224,254 @@ class AdminController extends Controller
             }
         }
 
-        $booking->update(['status' => 'completed']);
+        $validated = $request->validate([
+            'start_mileage' => 'required|numeric|min:0',
+            'end_mileage' => 'required|numeric|gt:start_mileage',
+            'total_distance' => 'nullable|numeric|min:0',
+        ]);
+
+        $booking->update([
+            'status' => 'completed',
+            'start_mileage' => $validated['start_mileage'] ?? null,
+            'end_mileage' => $validated['end_mileage'] ?? null,
+            'total_distance' => $validated['total_distance'] ?? null,
+        ]);
 
         // Send LINE Notify notification
         $booking->load(['user', 'van']);
         (new LineNotifyService())->notifyBookingCompleted($booking);
 
         return back()->with('success', 'บันทึกการเดินทางเสร็จสิ้นแล้ว');
+    }
+
+    /**
+     * Update van and driver assignment for a booking.
+     */
+    public function updateAssignment(Request $request, Booking $booking)
+    {
+        // Only allow editing for received or approved bookings
+        if (!in_array($booking->status, ['received', 'approved'])) {
+            return back()->with('error', 'ไม่สามารถแก้ไขการจัดรถสำหรับคำขอที่มีสถานะนี้ได้');
+        }
+
+        // Check department access
+        $user = Auth::user();
+        if (!$user->isSuperAdmin() && $user->isDepartmentAdmin()) {
+            if ($booking->requested_department !== $user->getAdminDepartment()) {
+                abort(403, 'ไม่มีสิทธิ์แก้ไขคำขอของหน่วยงานนี้');
+            }
+        }
+
+        $validated = $request->validate([
+            'van_id' => 'required|exists:vans,id',
+            'driver_id' => 'nullable|exists:users,id',
+        ]);
+
+        // Check van availability
+        $van = Van::findOrFail($validated['van_id']);
+        
+        // If van changed, check seat availability
+        if ($van->id !== $booking->van_id) {
+            $available = $van->getAvailableSeatsForDateRange($booking->start_date, $booking->end_date);
+            if ($available < $booking->seats_requested) {
+                return back()->with('error', 'ที่นั่งไม่เพียงพอ (ว่าง: ' . $available . ' ที่นั่ง)');
+            }
+        }
+
+        $booking->update([
+            'van_id' => $validated['van_id'],
+            'driver_id' => $validated['driver_id'] ?? null,
+        ]);
+
+        return back()->with('success', 'แก้ไขการจัดรถและคนขับเรียบร้อยแล้ว');
+    }
+
+    /**
+     * Cancel a booking (ยกเลิกคำขอ).
+     */
+    public function cancel(Request $request, Booking $booking)
+    {
+        // Only allow cancelling for pending, received, approved
+        if (!in_array($booking->status, ['pending', 'received', 'approved'])) {
+            return back()->with('error', 'ไม่สามารถยกเลิกคำขอที่มีสถานะนี้ได้');
+        }
+
+        // Check department access
+        $user = Auth::user();
+        if (!$user->isSuperAdmin() && $user->isDepartmentAdmin()) {
+            if ($booking->requested_department !== $user->getAdminDepartment()) {
+                abort(403, 'ไม่มีสิทธิ์ยกเลิกคำขอของหน่วยงานนี้');
+            }
+        }
+
+        $validated = $request->validate([
+            'cancelled_reason' => 'required|string|max:1000',
+            'cancelled_by_name' => 'required|string|max:255',
+        ]);
+
+        $booking->update([
+            'status' => 'cancelled',
+            'cancelled_reason' => $validated['cancelled_reason'],
+            'cancelled_by_name' => $validated['cancelled_by_name'],
+            'cancelled_by' => Auth::id(),
+            'cancelled_at' => now(),
+        ]);
+
+        return back()->with('success', 'ยกเลิกคำขอเรียบร้อยแล้ว');
+    }
+
+    /**
+     * Display reporting dashboard.
+     */
+    public function reports(Request $request)
+    {
+        $user = Auth::user();
+        
+        // Base dates
+        $startDate = $request->input('start_date', now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->input('end_date', now()->endOfMonth()->format('Y-m-d'));
+
+        // Query Bookings
+        $bookingsQuery = Booking::with(['user', 'van', 'driver']);
+        if (!$user->isSuperAdmin() && $user->isDepartmentAdmin()) {
+            $bookingsQuery->where('requested_department', $user->getAdminDepartment());
+        } elseif ($user->isSuperAdmin() && $request->filled('department') && $request->department !== 'all') {
+            $bookingsQuery->where('requested_department', $request->department);
+        }
+        
+        $bookingsQuery->whereDate('start_date', '>=', $startDate)
+                      ->whereDate('start_date', '<=', $endDate);
+        
+        $bookings = $bookingsQuery->orderBy('start_date', 'desc')->get();
+
+        // Query Vans for vehicle summaries
+        $vansQuery = Van::query();
+        if (!$user->isSuperAdmin() && $user->isDepartmentAdmin()) {
+            $vansQuery->where('owner_department', $user->getAdminDepartment());
+        } elseif ($user->isSuperAdmin() && $request->filled('department') && $request->department !== 'all') {
+            $vansQuery->where('owner_department', $request->department);
+        }
+        $vans = $vansQuery->get();
+
+        $vanSummaries = [];
+        foreach ($vans as $van) {
+            $vanBookings = Booking::where('van_id', $van->id)
+                ->whereDate('start_date', '>=', $startDate)
+                ->whereDate('start_date', '<=', $endDate)
+                ->whereIn('status', ['approved', 'completed'])
+                ->get();
+
+            $vanSummaries[] = [
+                'name' => $van->name,
+                'license_plate' => $van->license_plate,
+                'owner_department' => $van->owner_department,
+                'trips_count' => $vanBookings->count(),
+                'total_distance' => floatval($vanBookings->sum('total_distance')),
+            ];
+        }
+
+        // Stats
+        $totalBookings = $bookings->count();
+        $completedBookings = $bookings->where('status', 'completed')->count();
+        $pendingBookings = $bookings->where('status', 'pending')->count();
+        $approvedBookings = $bookings->where('status', 'approved')->count();
+        $rejectedBookings = $bookings->where('status', 'rejected')->count();
+
+        $totalDistance = $bookings->where('status', 'completed')->sum('total_distance');
+        $avgDistance = $completedBookings > 0 ? ($totalDistance / $completedBookings) : 0;
+
+        // Chart data arrays
+        $chartVanNames = [];
+        $chartVanTrips = [];
+        $chartVanDistances = [];
+        foreach ($vanSummaries as $summary) {
+            $chartVanNames[] = $summary['name'] . ' (' . $summary['license_plate'] . ')';
+            $chartVanTrips[] = $summary['trips_count'];
+            $chartVanDistances[] = $summary['total_distance'];
+        }
+
+        return view('admin.reports.index', compact(
+            'bookings',
+            'vanSummaries',
+            'startDate',
+            'endDate',
+            'totalBookings',
+            'completedBookings',
+            'pendingBookings',
+            'approvedBookings',
+            'rejectedBookings',
+            'totalDistance',
+            'avgDistance',
+            'chartVanNames',
+            'chartVanTrips',
+            'chartVanDistances'
+        ));
+    }
+
+    /**
+     * Export reports data to Excel format.
+     */
+    public function exportReport(Request $request)
+    {
+        $user = Auth::user();
+        
+        $startDate = $request->input('start_date', now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->input('end_date', now()->endOfMonth()->format('Y-m-d'));
+
+        // Query Bookings (same filters)
+        $bookingsQuery = Booking::with(['user', 'van', 'driver']);
+        if (!$user->isSuperAdmin() && $user->isDepartmentAdmin()) {
+            $bookingsQuery->where('requested_department', $user->getAdminDepartment());
+        } elseif ($user->isSuperAdmin() && $request->filled('department') && $request->department !== 'all') {
+            $bookingsQuery->where('requested_department', $request->department);
+        }
+        $bookingsQuery->whereDate('start_date', '>=', $startDate)
+                      ->whereDate('start_date', '<=', $endDate);
+        $bookings = $bookingsQuery->orderBy('start_date', 'desc')->get();
+
+        // Query Vans (same filters)
+        $vansQuery = Van::query();
+        if (!$user->isSuperAdmin() && $user->isDepartmentAdmin()) {
+            $vansQuery->where('owner_department', $user->getAdminDepartment());
+        } elseif ($user->isSuperAdmin() && $request->filled('department') && $request->department !== 'all') {
+            $vansQuery->where('owner_department', $request->department);
+        }
+        $vans = $vansQuery->get();
+
+        // Compute Summaries
+        $vanSummaries = [];
+        foreach ($vans as $van) {
+            $vanBookings = Booking::where('van_id', $van->id)
+                ->whereDate('start_date', '>=', $startDate)
+                ->whereDate('start_date', '<=', $endDate)
+                ->whereIn('status', ['approved', 'completed'])
+                ->get();
+            $vanSummaries[] = [
+                'name' => $van->name,
+                'license_plate' => $van->license_plate,
+                'owner_department' => $van->owner_department,
+                'trips_count' => $vanBookings->count(),
+                'total_distance' => $vanBookings->sum('total_distance'),
+            ];
+        }
+
+        // Stats
+        $totalBookings = $bookings->count();
+        $completedBookings = $bookings->where('status', 'completed')->count();
+        $totalDistance = $bookings->where('status', 'completed')->sum('total_distance');
+
+        // Render HTML representation
+        $html = view('admin.reports.excel', compact(
+            'bookings', 'vanSummaries', 'startDate', 'endDate',
+            'totalBookings', 'completedBookings', 'totalDistance'
+        ))->render();
+
+        $filename = 'car_usage_report_' . $startDate . '_to_' . $endDate . '.xls';
+
+        return response($html)
+            ->header('Content-Type', 'application/vnd.ms-excel; charset=utf-8')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 }

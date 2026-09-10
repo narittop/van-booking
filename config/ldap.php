@@ -1,5 +1,12 @@
 <?php
 
+if (!defined('LDAP_OPT_X_TLS_REQUIRE_CERT')) {
+    define('LDAP_OPT_X_TLS_REQUIRE_CERT', 24582);
+}
+if (!defined('LDAP_OPT_X_TLS_NEVER')) {
+    define('LDAP_OPT_X_TLS_NEVER', 0);
+}
+
 return [
 
     /*

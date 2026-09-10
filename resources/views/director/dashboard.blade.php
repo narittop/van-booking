@@ -79,6 +79,10 @@
                                                 <p class="text-xs text-gray-500">{{ $booking->seats_requested }} ที่นั่ง</p>
                                                 @if($booking->van)
                                                     <p class="text-xs text-green-600">{{ $booking->van->license_plate }}</p>
+                                                @else
+                                                    <span class="inline-flex items-center gap-1 text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-medium mt-1">
+                                                        รับเรื่อง(ไม่จัดรถ)
+                                                    </span>
                                                 @endif
                                             </div>
                                         </div>

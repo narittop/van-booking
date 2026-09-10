@@ -122,7 +122,23 @@ class LineNotifyService
         $message .= "━━━━━━━━━━━━━━━━━\n";
         $message .= "📋 เลขที่: #" . str_pad($booking->id, 6, '0', STR_PAD_LEFT) . "\n";
         $message .= "👤 ผู้ขอ: {$booking->user->name}\n";
-        $message .= "🏢 หน่วยงาน: {$this->getThaiDepartmentName($booking->requested_department)}\n";
+        $hrdPerson = $booking->user->hrdPerson;
+        $departmentName = '';
+        if ($hrdPerson) {
+            $faculty = $hrdPerson->faculty_name_th;
+            $unit = $hrdPerson->unit_name_th;
+            if ($faculty && $unit) {
+                $departmentName = "{$faculty} {$unit}";
+            } else {
+                $departmentName = $faculty ?: ($unit ?: '');
+            }
+        }
+        
+        if (empty($departmentName)) {
+            $departmentName = $this->getThaiDepartmentName($booking->requested_department);
+        }
+
+        $message .= "🏢 หน่วยงาน: {$departmentName}\n";
         $message .= "📅 วันที่: " . $booking->start_date->format('d/m/Y');
         
         if ($booking->start_date->ne($booking->end_date)) {
@@ -236,7 +252,15 @@ class LineNotifyService
         }
         
         $message .= "━━━━━━━━━━━━━━━━━\n";
-        $message .= "📋 สถานะ: รับเรื่องแล้ว (รอผู้อำนวยการอนุมัติ)";
+        
+        if (is_null($booking->van_id)) {
+            $message .= "📋 สถานะ: รับเรื่อง(ไม่จัดรถ)โดยแอดมิน (ส่งต่อผู้อนุมัติเพื่อพิจารณา)";
+            if ($booking->admin_notes) {
+                $message .= "\n📝 หมายเหตุ: {$booking->admin_notes}";
+            }
+        } else {
+            $message .= "📋 สถานะ: รับเรื่องแล้ว (รอผู้อนุมัติอนุมัติ)";
+        }
         
         // Send to Group
         $groupId = $this->getGroupId($booking);

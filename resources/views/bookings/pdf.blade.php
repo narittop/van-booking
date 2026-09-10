@@ -30,13 +30,13 @@
         
         body {
             font-family: 'THSarabunNew', 'DejaVu Sans', sans-serif;
-            font-size: 18px;
-            line-height: 1;
-            color: #333;
+            font-size: 22px;
+            line-height: 1.0;
+            color: #000000;
             margin-left: 40px;
             margin-right: 40px;
-            margin-top: 20px;
-            margin-bottom: 20px;
+            margin-top: 15px;
+            margin-bottom: 15px;
             padding: 0;
         }
         
@@ -48,27 +48,27 @@
         }
         
         .header h1 {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: bold;
             color: #1e1b4b;
             margin-bottom: 5px;
         }
         
         .header .subtitle {
-            font-size: 18px;
+            font-size: 22px;
             color: #6366f1;
             margin-bottom: 10px;
         }
         
         .header .print-date {
-            font-size: 14px;
-            color: #666;
+            font-size: 18px;
+            color: #111111;
         }
         
         .booking-id {
             text-align: right;
-            font-size: 14px;
-            color: #888;
+            font-size: 18px;
+            color: #222222;
             margin-bottom: 20px;
         }
         
@@ -91,7 +91,7 @@
         }
         
         .section-title {
-            font-size: 18px;
+            font-size: 22px;
             font-weight: bold;
             color: #4f46e5;
             border-bottom: 2px solid #e5e7eb;
@@ -105,19 +105,21 @@
         }
         
         .info-table td {
-            padding: 5px 5px;
-            border: 1px solid #e5e7eb;
+            padding: 4px 8px;
+            border: 1px solid #cccccc;
+            font-size: 18px;
         }
         
         .info-table .label {
             background-color: #f3f4f6;
             font-weight: bold;
             width: 35%;
-            color: #374151;
+            color: #000000;
         }
         
         .info-table .value {
             background-color: #fff;
+            color: #000000;
         }
         
         .passengers-table {
@@ -128,14 +130,17 @@
         .passengers-table th {
             background-color: #4f46e5;
             color: white;
-            padding: 12px 15px;
+            padding: 6px 10px;
             text-align: left;
             font-weight: bold;
+            font-size: 18px;
         }
         
         .passengers-table td {
-            padding: 5px 5px;
-            border-bottom: 1px solid #e5e7eb;
+            padding: 4px 10px;
+            border-bottom: 1px solid #cccccc;
+            font-size: 18px;
+            color: #000000;
         }
         
         .passengers-table tr:nth-child(even) {
@@ -144,16 +149,20 @@
         
         .purpose-box {
             background-color: #f3f4f6;
-            padding: 15px;
+            padding: 10px 15px;
             border-radius: 8px;
             border-left: 4px solid #4f46e5;
+            font-size: 18px;
+            color: #000000;
         }
         
         .notes-box {
             background-color: #fef3c7;
-            padding: 15px;
+            padding: 10px 15px;
             border-radius: 8px;
             border-left: 4px solid #f59e0b;
+            font-size: 18px;
+            color: #000000;
         }
         
         .footer {
@@ -161,8 +170,8 @@
             padding-top: 20px;
             border-top: 2px solid #e5e7eb;
             text-align: center;
-            font-size: 12px;
-            color: #666;
+            font-size: 16px;
+            color: #333333;
         }
         
         .signature-section {
@@ -179,7 +188,7 @@
         }
         
         .signature-line {
-            border-top: 1px solid #333;
+            border-top: 1px solid #000000;
             width: 200px;
             margin: 0 auto;
             margin-top: 60px;
@@ -189,65 +198,67 @@
 </head>
 <body>
     <!-- Header with Logo Area -->
-    <table style="width: 100%; margin-bottom: 20px;">
+    <table style="width: 100%; margin-bottom: 12px;">
         <tr>
             <td style="width: 15%; vertical-align: middle;">
                  <img src="{{ public_path('image/logorus.png') }}" style="width: 60px; height: auto;">
             </td>
-            <td style="width: 45%; vertical-align: middle;">
-                <div style="font-size: 24px; font-weight: bold; color: #1e40af;">ใบขออนุญาตใช้รถราชการ</div>
-                <div style="font-size: 14px; color: #6366f1; margin-top: 5px;">มหาวิทยาลัยเทคโนโลยีราชมงคลสุวรรณภูมิ</div>
+            <td style="width: 50%; vertical-align: middle;">
+                <div style="font-size: 28px; font-weight: bold; color: #1e3a8a;">ใบขออนุญาตใช้รถราชการ</div>
+                <div style="font-size: 18px; font-weight: bold; color: #4338ca; margin-top: 5px;">มหาวิทยาลัยเทคโนโลยีราชมงคลสุวรรณภูมิ</div>
             </td>
-            <td style="width: 25%; text-align: right;">
-                <div style="font-size: 12px; color: #666;">เลขที่: <strong>#{{ str_pad($booking->id, 6, '0', STR_PAD_LEFT) }}</strong></div>
-                <div style="font-size: 11px; color: #888; margin-top: 3px;">วันที่พิมพ์: {{ now()->format('d/m/Y H:i') }}</div>
+            <td style="width: 20%; text-align: right; vertical-align: middle;">
+                <div style="font-size: 16px; color: #000000; font-weight: bold;">เลขที่: <strong>#{{ str_pad($booking->id, 6, '0', STR_PAD_LEFT) }}</strong></div>
+                <div style="font-size: 15px; color: #111111; margin-top: 3px; font-weight: bold;">วันที่พิมพ์: {{ now()->format('d/m/Y H:i') }}</div>
+                
+                    <span class="status-badge status-{{ $booking->status }}">
+                    @if($booking->status === 'pending') ⏳ @elseif($booking->status === 'approved') ✓ @elseif($booking->status === 'rejected') ✗ @else ✓ @endif
+                    {{ $booking->status_text }}
+                </span> 
             </td>
             <td style="width: 15%; text-align: right; vertical-align: middle;">
                 @if(isset($qrCodeBase64) && $qrCodeBase64)
                 <div style="text-align: center;">
                     <img src="{{ $qrCodeBase64 }}" style="width: 70px; height: 70px;">
-                    <div style="font-size: 9px; color: #888; margin-top: 2px;">สแกนเพื่อตรวจสอบ</div>
+                    <div style="font-size: 12px; color: #111111; font-weight: bold; margin-top: 2px;">สแกนเพื่อตรวจสอบ</div>
                 </div>
                 @endif
             </td>
         </tr>
     </table>
     
-    <div style="border-bottom: 3px solid #4f46e5; margin-bottom: 20px;"></div>
+    <div style="border-bottom: 3px solid #4f46e5; margin-bottom: 12px;"></div>
     
     <!-- Status Badge -->
-    <table style="width: 100%; margin-bottom: 20px;">
+    <!-- <table style="width: 100%; margin-bottom: 12px;">
         <tr>
             <td style="text-align: center;">
-                <span class="status-badge status-{{ $booking->status }}">
-                    @if($booking->status === 'pending') ⏳ @elseif($booking->status === 'approved') ✓ @elseif($booking->status === 'rejected') ✗ @else ✓ @endif
-                    {{ $booking->status_text }}
-                </span>
+              
             </td>
         </tr>
-    </table>
+    </table> -->
     
     <!-- Main Info Grid - 2 Columns -->
-    <table style="width: 100%; margin-bottom: 20px; border-collapse: collapse;">
+    <table style="width: 100%; margin-bottom: 12px; border-collapse: collapse;">
         <tr>
             <!-- Left Column: ข้อมูลผู้ขอ -->
             <td style="width: 48%; vertical-align: top; padding-right: 10px;">
                 <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #bae6fd; border-radius: 8px; padding: 15px;">
-                    <div style="font-size: 14px; font-weight: bold; color: #0369a1; margin-bottom: 12px; border-bottom: 1px solid #7dd3fc; padding-bottom: 8px;">
+                    <div style="font-size: 18px; font-weight: bold; color: #0369a1; margin-bottom: 12px; border-bottom: 1px solid #7dd3fc; padding-bottom: 8px;">
                         ข้อมูลผู้ขอใช้รถ
                     </div>
-                    <table style="width: 100%; font-size: 13px;">
+                    <table style="width: 100%; font-size: 17px; color: #000000;">
                         <tr>
-                            <td style="color: #666; padding: 4px 0; width: 40%;">ชื่อผู้ขอ:</td>
-                            <td style="font-weight: bold; padding: 4px 0;">{{ $booking->user->name }}</td>
+                            <td style="color: #000000; font-weight: bold; padding: 6px 0; width: 35%;">ชื่อผู้ขอ:</td>
+                            <td style="font-weight: bold; padding: 6px 0;">{{ $booking->user->name }}</td>
                         </tr>
                         <tr>
-                            <td style="color: #666; padding: 4px 0;">หน่วยงาน:</td>
-                            <td style="padding: 4px 0;">{{ \App\Models\Van::DEPARTMENT_LABELS[$booking->requested_department] ?? '-' }}</td>
+                            <td style="color: #000000; font-weight: bold; padding: 6px 0;">หน่วยงาน:</td>
+                            <td style="font-weight: bold; padding: 6px 0;">{{ $booking->user->hrdPerson?->faculty_name_th ?? '-' }}</td>
                         </tr>
                         <tr>
-                            <td style="color: #666; padding: 4px 0;">วันที่ขอ:</td>
-                            <td style="padding: 4px 0;">{{ $booking->created_at->format('d/m/Y H:i') }}</td>
+                            <td style="color: #000000; font-weight: bold; padding: 6px 0;">วันที่ขอ:</td>
+                            <td style="font-weight: bold; padding: 6px 0;">{{ $booking->created_at->format('d/m/Y H:i') }}</td>
                         </tr>
                     </table>
                 </div>
@@ -256,27 +267,38 @@
             <!-- Right Column: รถ & พขร -->
             <td style="width: 48%; vertical-align: top; padding-left: 10px;">
                 <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid #bbf7d0; border-radius: 8px; padding: 15px;">
-                    <div style="font-size: 14px; font-weight: bold; color: #15803d; margin-bottom: 12px; border-bottom: 1px solid #86efac; padding-bottom: 8px;">
+                    <div style="font-size: 18px; font-weight: bold; color: #15803d; margin-bottom: 12px; border-bottom: 1px solid #86efac; padding-bottom: 8px;">
                         รถและพนักงานขับรถ
                     </div>
-                    <table style="width: 100%; font-size: 13px;">
+                    <table style="width: 100%; font-size: 17px; color: #000000;">
                         <tr>
-                            <td style="color: #666; padding: 4px 0; width: 40%;">รถที่ใช้:</td>
-                            <td style="font-weight: bold; padding: 4px 0;">
-                                @if($booking->van) {{ $booking->van->name }} @else <span style="color: #999;">รอมอบหมาย</span> @endif
+                            <td style="color: #000000; font-weight: bold; padding: 6px 0; width: 25%;">รถที่ใช้:</td>
+                            <td style="font-weight: bold; padding: 6px 0; width: 50%;">
+                                @if($booking->van) {{ $booking->van->name }} @else <span style="color: #444444; font-weight: bold;">รอมอบหมาย</span> @endif
+                            </td>
+                            <td style="font-weight: bold; padding: 6px 0; width: 25%;">
+                               <span style="color: #111111;">เลขไมล์เริ่มต้น.............................</span> 
                             </td>
                         </tr>
                         <tr>
-                            <td style="color: #666; padding: 4px 0;">ทะเบียน:</td>
-                            <td style="padding: 4px 0;">
+                            <td style="color: #000000; font-weight: bold; padding: 6px 0;">ทะเบียน:</td>
+                            <td style="font-weight: bold; padding: 6px 0;">
                                 @if($booking->van) {{ $booking->van->license_plate }} @else - @endif
                             </td>
+                            <td style="font-weight: bold; padding: 6px 0;">
+                               <span style="color: #111111;">เลขไมล์สิ้นสุด.............................</span> 
+                            </td>
                         </tr>
                         <tr>
-                            <td style="color: #666; padding: 4px 0;">พนักงานขับรถ:</td>
-                            <td style="padding: 4px 0;">
-                                @if($booking->driver) {{ $booking->driver->name }} @else <span style="color: #999;">รอมอบหมาย</span> @endif
+                            <td style="color: #000000; font-weight: bold; padding: 6px 0;">พนักงานขับรถ:</td>
+                            <td colspan="2" style="font-weight: bold; padding: 6px 0;">
+                                @if($booking->driver)
+                                    {{ $booking->driver->name }} @if($booking->driver->phone) (โทร. {{ $booking->driver->phone }}) @endif
+                                @else
+                                    <span style="color: #444444; font-weight: bold;">รอมอบหมาย</span>
+                                @endif
                             </td>
+                           
                         </tr>
                     </table>
                 </div>
@@ -285,57 +307,63 @@
     </table>
     
     <!-- Travel Details -->
-    <div style="background: #fff; border: 2px solid #4f46e5; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
-        <div style="font-size: 14px; font-weight: bold; color: #4f46e5; margin-bottom: 15px;">
+    <div style="background: #fff; border: 2.5px solid #4f46e5; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px;">
+        <div style="font-size: 18px; font-weight: bold; color: #4f46e5; margin-bottom: 12px;">
             รายละเอียดการเดินทาง
         </div>
         
-        <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+        <table style="width: 100%; font-size: 17px; color: #000000; border-collapse: collapse;">
             <tr>
-                <td style="width: 25%; background: #f3f4f6; padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">วันที่เริ่มต้น</td>
-                <td style="width: 25%; padding: 10px; border: 1px solid #e5e7eb;">{{ $booking->start_date->format('d/m/Y') }} เวลา {{ $booking->start_time }} น.</td>
-                <td style="width: 25%; background: #f3f4f6; padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">วันที่สิ้นสุด</td>
-                <td style="width: 25%; padding: 10px; border: 1px solid #e5e7eb;">{{ $booking->end_date ? $booking->end_date->format('d/m/Y') : '-' }} เวลา {{ $booking->end_time }} น.</td>
+                <td style="width: 18%; background: #f3f4f6; padding: 10px; border: 1px solid #cccccc; font-weight: bold;">วันที่เริ่มต้น</td>
+                <td style="width: 32%; padding: 10px; border: 1px solid #cccccc; font-weight: bold;">{{ $booking->start_date->format('d/m/Y') }} เวลา {{ $booking->start_time }} น.</td>
+                <td style="width: 15%; background: #f3f4f6; padding: 10px; border: 1px solid #cccccc; font-weight: bold;">วันที่สิ้นสุด</td>
+                <td style="width: 33%; padding: 10px; border: 1px solid #cccccc; font-weight: bold;">{{ $booking->end_date ? $booking->end_date->format('d/m/Y') : '-' }} เวลา {{ $booking->end_time }} น.</td>
             </tr>
             <tr>
-                <td style="background: #f3f4f6; padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">สถานที่รอรถ</td>
-                <td style="padding: 10px; border: 1px solid #e5e7eb;">{{ $booking->pickup_location }}</td>
-                <td style="background: #f3f4f6; padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">ปลายทาง</td>
-                <td style="padding: 10px; border: 1px solid #e5e7eb;">{{ $booking->destination }}</td>
+                <td style="width: 18%; background: #f3f4f6; padding: 10px; border: 1px solid #cccccc; font-weight: bold;">สถานที่รอรถ</td>
+                <td style="width: 32%; padding: 10px; border: 1px solid #cccccc; font-weight: bold;">{{ $booking->pickup_location }}</td>
+                <td style="width: 15%; background: #f3f4f6; padding: 10px; border: 1px solid #cccccc; font-weight: bold;">ปลายทาง</td>
+                <td style="width: 35%; padding: 10px; border: 1px solid #cccccc; font-weight: bold;">{{ $booking->destination }}</td>
             </tr>
+    
             <tr>
-                <td style="background: #f3f4f6; padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">จำนวนผู้โดยสาร</td>
-                <td colspan="3" style="padding: 10px; border: 1px solid #e5e7eb;">{{ $booking->seats_requested }} คน</td>
+                <td style="background: #f3f4f6; padding: 10px; border: 1px solid #cccccc; font-weight: bold;">ช่องทางการติดต่อ</td>
+                <td colspan="3" style="padding: 10px; border: 1px solid #cccccc; font-weight: bold;">{{ $booking->contact ?? '-' }}</td>
             </tr>
+    
+            <!-- <tr>
+                <td style="background: #f3f4f6; padding: 10px; border: 1px solid #cccccc; font-weight: bold;">จำนวนผู้โดยสาร</td>
+                <td colspan="3" style="padding: 10px; border: 1px solid #cccccc; font-weight: bold;">{{ $booking->seats_requested }} คน</td>
+            </tr> -->
         </table>
     </div>
     
     <!-- Purpose -->
-    <div style="margin-bottom: 20px;">
-        <div style="font-size: 14px; font-weight: bold; color: #374151; margin-bottom: 8px;">วัตถุประสงค์การเดินทาง</div>
-        <div style="background: #fafafa; border: 1px solid #e5e7eb; border-left: 4px solid #4f46e5; padding: 12px; border-radius: 4px; font-size: 13px;">
+    <div style="margin-bottom: 12px;">
+        <div style="font-size: 18px; font-weight: bold; color: #000000; margin-bottom: 8px;">วัตถุประสงค์การเดินทาง</div>
+        <div style="background: #fafafa; border: 1px solid #cccccc; border-left: 4px solid #4f46e5; padding: 12px; border-radius: 4px; font-size: 17px; font-weight: bold; color: #000000;">
             {{ $booking->purpose }}
         </div>
     </div>
     
     <!-- Passengers List -->
     @if($booking->passengers->count() > 0)
-    <div style="margin-bottom: 20px;">
-        <div style="font-size: 14px; font-weight: bold; color: #374151; margin-bottom: 8px;"> รายชื่อผู้โดยสาร ({{ $booking->passengers->count() }} คน)</div>
-        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+    <div style="margin-bottom: 12px;">
+        <div style="font-size: 18px; font-weight: bold; color: #000000; margin-bottom: 8px;">รายชื่อผู้โดยสาร ({{ $booking->passengers->count() }} คน)</div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 16px; color: #000000;">
             <thead>
                 <tr>
-                    <th style="background: #4f46e5; color: white; padding: 8px; text-align: center; width: 40px;">ลำดับ</th>
-                    <th style="background: #4f46e5; color: white; padding: 8px; text-align: left;">ชื่อ-นามสกุล</th>
-                    <th style="background: #4f46e5; color: white; padding: 8px; text-align: left;">หน่วยงาน</th>
+                    <th style="background: #4f46e5; color: white; padding: 8px; text-align: center; width: 60px; font-weight: bold; font-size: 16px;">ลำดับ</th>
+                    <th style="background: #4f46e5; color: white; padding: 8px; text-align: left; font-weight: bold; font-size: 16px;">ชื่อ-นามสกุล</th>
+                    <th style="background: #4f46e5; color: white; padding: 8px; text-align: left; font-weight: bold; font-size: 16px;">หน่วยงาน</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($booking->passengers as $index => $passenger)
                 <tr style="background: {{ $index % 2 == 0 ? '#fff' : '#f9fafb' }};">
-                    <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: center;">{{ $index + 1 }}</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">{{ $passenger->name }}</td>
-                    <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">{{ $passenger->department ?? '-' }}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #cccccc; text-align: center; font-weight: bold;">{{ $index + 1 }}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #cccccc; font-weight: bold;">{{ $passenger->name }}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #cccccc; font-weight: bold;">{{ $passenger->department ?? '-' }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -346,11 +374,11 @@
     <!-- Admin Notes -->
     @if($booking->admin_notes)
     <div style="margin-bottom: 5px;">
-        <div style="font-size: 14px; font-weight: bold; color: #374151; margin-bottom: 5px;">หมายเหตุจากผู้อนุมัติ</div>
-        <div style="background: #fef3c7; border: 1px solid #fcd34d; border-left: 4px solid #f59e0b; padding: 12px; border-radius: 4px; font-size: 13px;">
+        <div style="font-size: 18px; font-weight: bold; color: #000000; margin-bottom: 5px;">หมายเหตุจากผู้อนุมัติ</div>
+        <div style="background: #fef3c7; border: 1px solid #fcd34d; border-left: 4px solid #f59e0b; padding: 12px; border-radius: 4px; font-size: 17px; font-weight: bold; color: #000000;">
             {{ $booking->admin_notes }}
             @if($booking->approver)
-            <div style="margin-top: 10px; font-size: 11px; color: #666;">
+            <div style="margin-top: 10px; font-size: 15px; color: #333333; font-weight: bold;">
                 โดย {{ $booking->approver->name }} เมื่อ {{ $booking->approved_at->format('d/m/Y H:i') }} น.
             </div>
             @endif
@@ -362,30 +390,55 @@
     <div style="margin-top: 5px;">
         <table style="width: 100%;">
             <tr>
-                <td style="width: 30%; text-align: center; padding: 20px;">
-                    <div style="margin-top: 50px; border-top: 1px solid #333; width: 180px; margin-left: auto; margin-right: auto; padding-top: 8px;">
+                <td style="width: 30%; text-align: center; padding: 20px; vertical-align: bottom;">
+                    <div style="font-size: 16px; font-weight: bold; color: #10b981; margin-bottom: 5px;">
+                        ส่งคำขอผ่านระบบ
+                    </div>
+                    <div style="border-top: 1.5px solid #000000; width: 180px; margin-left: auto; margin-right: auto; padding-top: 8px; font-weight: bold; font-size: 18px; color: #000000;">
                        ผู้ขอใช้รถ
                     </div>
-                    <div style="margin-top: 5px; font-size: 12px;">@if($booking->user){{ $booking->user->name }}@endif</div>
-                    <div style="font-size: 11px; color: #666;">วันที่ {{ $booking->created_at->format('d/m/Y H:i:s') }}</div>
+                    <div style="margin-top: 5px; font-size: 16px; font-weight: bold; color: #000000;">@if($booking->user){{ $booking->user->name }}@endif</div>
+                    <div style="font-size: 15px; color: #333333; font-weight: bold;">วันที่ {{ $booking->created_at->format('d/m/Y H:i:s') }}</div>
                 </td>
-                <td style="width: 40%; text-align: center; padding: 20px;">
-                    <div style="margin-top: 50px; border-top: 1px solid #333; width: 180px; margin-left: auto; margin-right: auto; padding-top: 8px;">
-                        ผู้อนุมัติ
+                <td style="width: 35%; text-align: center; padding: 20px; vertical-align: bottom;">
+                    @if($booking->receiver)
+                        <div style="font-size: 16px; font-weight: bold; color: #3b82f6; margin-bottom: 5px;">
+                            รับเรื่องผ่านระบบ
+                        </div>
+                    @else
+                        <div style="height: 29px;"></div>
+                    @endif
+                    <div style="border-top: 1.5px solid #000000; width: 180px; margin-left: auto; margin-right: auto; padding-top: 8px; font-weight: bold; font-size: 18px; color: #000000;">
+                         ผู้รับเรื่อง
                     </div>
-                    <div style="margin-top: 5px; font-size: 12px;">@if($booking->approver){{ $booking->approver->name }}@else ................................................@endif</div>
-                    <div style="font-size: 11px; color: #666;">วันที่ {{ $booking->approved_at ? $booking->approved_at->format('d/m/Y H:i:s') : '................................................' }}</div>
+                    <div style="margin-top: 5px; font-size: 16px; font-weight: bold; color: #000000;">@if($booking->receiver){{ $booking->receiver->name }}@else ................................................@endif</div>
+                    <div style="font-size: 15px; color: #333333; font-weight: bold;">วันที่ {{ $booking->received_at ? $booking->received_at->format('d/m/Y H:i:s') : '................................................' }}</div>
                 </td>
-                <td style="width: 30%; text-align: center; padding: 20px;">
-
+                <td style="width: 35%; text-align: center; padding: 20px; vertical-align: bottom;">
+                    @if($booking->approver)
+                        <div style="font-size: 16px; font-weight: bold; color: @if($booking->status === 'rejected') #ef4444 @else #10b981 @endif; margin-bottom: 5px;">
+                            @if($booking->status === 'rejected')
+                                ไม่อนุมัติผ่านระบบ
+                            @else
+                                อนุมัติผ่านระบบ
+                            @endif
+                        </div>
+                    @else
+                        <div style="height: 29px;"></div>
+                    @endif
+                    <div style="border-top: 1.5px solid #000000; width: 180px; margin-left: auto; margin-right: auto; padding-top: 8px; font-weight: bold; font-size: 18px; color: #000000;">
+                         ผู้อนุมัติ
+                    </div>
+                    <div style="margin-top: 5px; font-size: 16px; font-weight: bold; color: #000000;">@if($booking->approver){{ $booking->approver->name }}@else ................................................@endif</div>
+                    <div style="font-size: 15px; color: #333333; font-weight: bold;">วันที่ {{ $booking->approved_at ? $booking->approved_at->format('d/m/Y H:i:s') : '................................................' }}</div>
                 </td>
             </tr>
         </table>
     </div>
     
     <!-- Footer -->
-    <div style="margin-top: 10px; padding-top: 5px; border-top: 1px solid #e5e7eb; text-align: center; font-size: 10px; color: #888;">
-        เอกสารนี้พิมพ์จากระบบจองรถตู้ มหาวิทยาลัยเทคโนโลยีราชมงคลสุวรรณภูมิ
+    <div style="margin-top: 10px; padding-top: 5px; border-top: 1px solid #cccccc; text-align: center; font-size: 14px; color: #333333; font-weight: bold;">
+        เอกสารนี้พิมพ์จากระบบขอใช้รถราชการ มหาวิทยาลัยเทคโนโลยีราชมงคลสุวรรณภูมิ
     </div>
 </body>
 </html>

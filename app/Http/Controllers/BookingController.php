@@ -53,6 +53,7 @@ class BookingController extends Controller
             'destination' => 'required|string|max:255',
             'purpose' => 'required|string',
             'requested_department' => 'required|in:gad,subnon,subwa,subsu',
+            'contact' => 'required|string|max:255',
             'attachment' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
             'passengers' => 'nullable|array',
             'passengers.*.name' => 'required_with:passengers|string|max:255',
@@ -76,6 +77,7 @@ class BookingController extends Controller
             'purpose' => $validated['purpose'],
             'requested_department' => $validated['requested_department'],
             'attachment_path' => $attachmentPath,
+            'contact' => $validated['contact'],
             'status' => 'pending',
         ]);
 
@@ -107,7 +109,7 @@ class BookingController extends Controller
             abort(403);
         }
 
-        $booking->load(['van', 'driver', 'passengers', 'approver']);
+        $booking->load(['van', 'driver', 'passengers', 'approver', 'receiver']);
         
         // Get fellow travelers from other approved bookings using the same van on overlapping dates
         $fellowTravelers = collect();
@@ -160,8 +162,13 @@ class BookingController extends Controller
      */
     public function downloadPdf(Booking $booking)
     {
-        // Ensure user can only download their own bookings
-        if ($booking->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
+        // Ensure user has permission to download this booking
+        $user = Auth::user();
+        $isAuthorized = $booking->user_id === $user->id 
+            || $user->isAdmin() 
+            || ($user->isDirector() && $user->canDirectDepartment($booking->requested_department));
+
+        if (!$isAuthorized) {
             abort(403);
         }
 

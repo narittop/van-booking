@@ -203,6 +203,10 @@
                         <div class="info-label">หน่วยงาน</div>
                         <div class="info-value">{{ \App\Models\Van::DEPARTMENT_LABELS[$booking->requested_department] ?? '-' }}</div>
                     </div>
+                    <div class="info-item full">
+                        <div class="info-label">ช่องทางการติดต่อ</div>
+                        <div class="info-value">{{ $booking->contact ?? '-' }}</div>
+                    </div>
                 </div>
             </div>
             

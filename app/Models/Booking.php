@@ -23,12 +23,20 @@ class Booking extends Model
         'purpose',
         'requested_department',
         'attachment_path',
+        'contact',
         'status',
         'admin_notes',
         'received_by',
         'received_at',
         'approved_by',
         'approved_at',
+        'start_mileage',
+        'end_mileage',
+        'total_distance',
+        'cancelled_reason',
+        'cancelled_by_name',
+        'cancelled_by',
+        'cancelled_at',
     ];
 
     protected $casts = [
@@ -36,6 +44,7 @@ class Booking extends Model
         'end_date' => 'date',
         'received_at' => 'datetime',
         'approved_at' => 'datetime',
+        'cancelled_at' => 'datetime',
     ];
 
     public function user()
@@ -63,6 +72,11 @@ class Booking extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
+    public function canceller()
+    {
+        return $this->belongsTo(User::class, 'cancelled_by');
+    }
+
     public function passengers()
     {
         return $this->hasMany(Passenger::class);
@@ -70,24 +84,34 @@ class Booking extends Model
 
     public function getStatusBadgeAttribute()
     {
+        if ($this->status === 'received' && is_null($this->van_id)) {
+            return 'bg-orange-100 text-orange-800';
+        }
+
         return match($this->status) {
             'pending' => 'bg-yellow-100 text-yellow-800',
             'received' => 'bg-blue-100 text-blue-800',
             'approved' => 'bg-green-100 text-green-800',
             'rejected' => 'bg-red-100 text-red-800',
             'completed' => 'bg-purple-100 text-purple-800',
+            'cancelled' => 'bg-gray-100 text-gray-800',
             default => 'bg-gray-100 text-gray-800',
         };
     }
 
     public function getStatusTextAttribute()
     {
+        if ($this->status === 'received' && is_null($this->van_id)) {
+            return 'รับเรื่อง(ไม่จัดรถ) (ส่งต่อผู้อนุมัติ)';
+        }
+
         return match($this->status) {
             'pending' => 'รอรับเรื่อง',
             'received' => 'รับเรื่องแล้ว',
             'approved' => 'อนุมัติแล้ว',
             'rejected' => 'ไม่อนุมัติ',
             'completed' => 'เสร็จสิ้น',
+            'cancelled' => 'ยกเลิก',
             default => $this->status,
         };
     }

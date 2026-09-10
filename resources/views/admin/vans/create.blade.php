@@ -53,11 +53,16 @@
 
                         <div class="mb-6">
                             <label for="owner_department" class="block text-sm font-medium text-gray-700 mb-2">หน่วยงานเจ้าของรถ <span class="text-red-500">*</span></label>
-                            <select name="owner_department" id="owner_department" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                @foreach(\App\Models\Van::DEPARTMENT_LABELS as $value => $label)
-                                    <option value="{{ $value }}" {{ old('owner_department') === $value ? 'selected' : '' }}>{{ $label }}</option>
-                                @endforeach
-                            </select>
+                            @if(Auth::user()->isSuperAdmin())
+                                <select name="owner_department" id="owner_department" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                    @foreach(\App\Models\Van::DEPARTMENT_LABELS as $value => $label)
+                                        <option value="{{ $value }}" {{ old('owner_department') === $value ? 'selected' : '' }}>{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            @else
+                                <input type="hidden" name="owner_department" value="{{ Auth::user()->getAdminDepartment() }}">
+                                <input type="text" readonly value="{{ \App\Models\Van::DEPARTMENT_LABELS[Auth::user()->getAdminDepartment()] ?? Auth::user()->getAdminDepartment() }}" class="w-full rounded-md border-gray-300 bg-gray-50 text-gray-500 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 cursor-not-allowed">
+                            @endif
                             @error('owner_department')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror

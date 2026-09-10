@@ -2,17 +2,17 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                การจองของฉัน
+                คำขอใช้รถราชการของฉัน
             </h2>
             <a href="{{ route('bookings.create') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 border border-transparent rounded-xl font-semibold text-sm text-white shadow-lg shadow-indigo-500/30 hover:from-indigo-700 hover:to-purple-700 hover:shadow-indigo-500/40 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
-                ขอใช้รถ
+                ขอใช้รถราชการ
             </a>
         </div>
     </x-slot>
-
+    
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             @if(session('success'))
@@ -26,6 +26,35 @@
                     {{ session('error') }}
                 </div>
             @endif
+
+            <!-- Line Notification Alert Banner -->
+            <div class="mb-6 bg-gradient-to-r from-emerald-500/10 via-green-500/10 to-teal-500/10 border border-emerald-500/20 rounded-2xl p-4 shadow-sm backdrop-blur-sm relative overflow-hidden transition-all duration-300 hover:shadow-md hover:border-emerald-500/30">
+                <!-- Background decoration element -->
+                <div class="absolute right-0 top-0 -mt-4 -mr-4 w-24 h-24 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-full blur-xl pointer-events-none"></div>
+                
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
+                    <div class="flex items-center gap-3">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+                            <!-- LINE logo -->
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-emerald-950">รับการแจ้งเตือนสถานะการขอใช้รถ ผ่านทางไลน์ RUS Connext ได้ที่นี่</p>
+                            <p class="text-xs text-emerald-800/80">ระบบจะส่งความคืบหน้าการจองและการอนุมัติรถตรงถึงมือคุณทันที</p>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <a href="https://arit.rmutsb.ac.th/line-rus-connext" target="_blank" class="inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-500/20 hover:shadow-emerald-500/30 transform hover:-translate-y-0.5 transition-all duration-200">
+                            เปิดใช้งาน
+                            <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
@@ -122,6 +151,7 @@
                                                         </svg>
                                                         ดู
                                                     </a>
+                                                    
                                                     @if($booking->status === 'pending')
                                                         <form action="{{ route('bookings.destroy', $booking) }}" method="POST" class="inline" onsubmit="return confirm('ยืนยันการยกเลิก?')">
                                                             @csrf
